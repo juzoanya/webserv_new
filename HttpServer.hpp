@@ -30,6 +30,7 @@ class HttpServer
 		void	handleWrite(int clientSocket);
 		void	handleAccept();
 		void	handleClientEvent(int clientSocket);
+		void	stopMonitoring(int clientSocket);
 
 		class ListeningForConnectionException : std::exception
 		{
@@ -116,6 +117,14 @@ class HttpServer
 			public:
 				const char* what() const throw(){
 					return("Error accepting connection.");
+				}
+		};
+
+		class FailedToCloseFdException : std::exception
+		{
+			public:
+				const char* what() const throw(){
+					return("Error closing file descriptor.");
 				}
 		};
 };
