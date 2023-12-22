@@ -1,7 +1,7 @@
 
 
 
-#include "HttpServer.hpp"
+#include "headers.hpp"
 
 // HttpServer::HttpServer() : _serverSocket(-1)
 // {
@@ -10,7 +10,7 @@
 
 HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0)
 {
-	unsigned short	port = 8081;
+	unsigned short	port = 8083;
 
 	this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_serverSocket == -1)
@@ -106,10 +106,10 @@ void	HttpServer::handleRead(int clientSocket)
 	}
 	else
 	{
+		std::cout << buffer << std::endl;
+		// RequestHandler	handler;
 		// std::string	request(buffer, readByte);
-		// std::string	response = RequestHandler::handleRequest(request);
-		//std::cout << buffer << std::endl;
-		handleWrite(clientSocket);
+		// std::string	response = handler.handleRequest(request);
 	}
 }
 
@@ -119,11 +119,20 @@ void	HttpServer::handleWrite(int clientSocket)
 	ssize_t writeByte = send(clientSocket, response, strlen(response), 0);
 	if (writeByte == -1)
 		throw HttpServer::ClientSocketWriteException();
-
-
-	// if (close(clientSocket) == -1)
-	// 	throw HttpServer::FailedToCloseFdException();
-	// stopMonitoring(clientSocket);
+	else if (writeByte == 0)
+	{
+		// Connection closed by client
+		if (close(clientSocket) == -1)
+			throw HttpServer::FailedToCloseFdException();
+		stopMonitoring(clientSocket);
+	}
+	else
+	{
+		std::cout << "Byte Sent: " << writeByte << std::endl;
+		if (close(clientSocket) == -1)
+			throw HttpServer::FailedToCloseFdException();
+		stopMonitoring(clientSocket);
+	}
 }
 
 void	HttpServer::handleAccept()
@@ -140,15 +149,15 @@ void	HttpServer::handleAccept()
 		fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 
 		// Add client socket to pollfd array
-		// for (int i = 0; i != this->_nfds; ++i)
-		// {
-		// 	if (this->_fds[i].fd == -1){
-		// 		this->_fds[this->_nfds].fd = clientSocket;
-		// 		break;
-		// 	}
-		// }
+		for (int i = 0; i != this->_nfds; ++i)
+		{
+			if (this->_fds[i].fd == -1){
+				this->_fds[this->_nfds].fd = clientSocket;
+				break;
+			}
+		}
 		this->_fds[this->_nfds].fd = clientSocket;
-		this->_fds[this->_nfds].events = POLLIN;
+		this->_fds[this->_nfds].events = POLLIN | POLLHUP | POLLOUT;
 		this->_nfds++;
 		break;
 	}

@@ -6,6 +6,7 @@
 
 #include "headers.hpp"
 
+class ResponseHandler;
 
 class RequestHandler
 {
@@ -20,6 +21,8 @@ class RequestHandler
 		static std::string	getRequestPath(const std::string& request);
 		static std::string	handleGetRequest(const std::string& path);
 		static std::string	generateErrorResponse();
+		static std::string	servePage(const std::string& path);
+		static bool	fileExists(const std::string& filename);
 };
 
 

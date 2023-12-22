@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2023/12/14 17:08:00 by juzoanya         ###   ########.fr       */
+/*   Updated: 2023/12/20 17:25:31 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <map>
 #include <vector>
 #include <stack>
+#include <algorithm>
 
 #include <exception>
 #include <fstream>
@@ -38,6 +39,7 @@
 
 #include "HttpServer.hpp"
 #include "RequestHandler.hpp"
+#include "ResponseHandler.hpp"
 
 
 #endif

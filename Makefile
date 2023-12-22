@@ -5,6 +5,8 @@ CC = g++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -ggdb3
 
 SRC = 	HttpServer.cpp \
+		RequestHandler.cpp \
+		ResponseHandler.cpp \
 		main.cpp
 
 HEADERS = headers.hpp
