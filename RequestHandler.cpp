@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:11:40 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/04 16:50:46 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/04 18:57:54 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ std::string	RequestHandler::handleRequest(const std::string& request)
 		else
 			return ("Error");//TODO: generate error response for no available method
 	}
+	std::cout << "HR, Done" << std::endl;
 	return ("");
 }
 
@@ -74,7 +75,8 @@ std::string	RequestHandler::handleGetRequest(const std::string& path)
 	indexes.push_back("index.html");
 	indexes.push_back("index.htm");
 	indexes.push_back("index.php");
-	root.push_back("~/");
+	//TODO: check for the correct dir for the server to handle the request using header and parse it to root
+	root.push_back("/home/jakes/");
 
 	if (path == "/")
 	{
@@ -83,15 +85,14 @@ std::string	RequestHandler::handleGetRequest(const std::string& path)
 		{
 			std::string	fullPath = root[0] + *it;
 			std::cout << fullPath << std::endl;
-			if (fileExists(fullPath))
-				return (response.getStaticPage(fullPath));
+			return (response.getStaticPage(fullPath));
 		}
 	}
 	else if (isDirectory(path.substr(1)))
 		std::cout << "This is a directory" << std::endl; //TODO: handle directory listing
 	else
 		return (response.getStaticPage(path.substr(1)));
-	return (NULL);
+	return ("");
 }
 
 bool	RequestHandler::fileExists(const std::string& filename)

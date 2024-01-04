@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:12 by juzoanya          #+#    #+#             */
-/*   Updated: 2023/12/27 11:12:17 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/04 19:24:28 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 // 	// SocketAddr_in	serverAddress;
 // }
 
-HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0)
+HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0), _response("")
 {
-	unsigned short	port = 8083;
+	unsigned short	port = 8082;
 
 	this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_serverSocket == -1)
@@ -116,16 +116,46 @@ void	HttpServer::handleRead(int clientSocket)
 	else
 	{
 		std::cout << buffer << std::endl;
-		// RequestHandler	handler;
-		// std::string	request(buffer, readByte);
-		// std::string	response = handler.handleRequest(request);
+		RequestHandler	handler;
+		std::string	request(buffer, readByte);
+		std::cout << "<______________>" << std::endl;
+		this->_response = handler.handleRequest(request);
 	}
 }
 
 void	HttpServer::handleWrite(int clientSocket)
 {
-	const char*	response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World.";
+	const char*	response = this->_response.c_str(); //"HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World.";
+	// size_t	sentByte = 0;
+	// size_t	totalByte = strlen(response);
+
+	std::cout << "Start Sending..." << std::endl;
+	std::cout << response << std::endl;
+	
 	ssize_t writeByte = send(clientSocket, response, strlen(response), 0);
+
+	// while (sentByte < totalByte)
+	// {
+	// 	size_t	remByte = totalByte - sentByte;
+	// 	size_t	batchByte;
+	// 	if (remByte < totalByte)
+	// 		batchByte = remByte;
+	// 	else
+	// 		batchByte = totalByte;
+	// 	ssize_t writeByte = send(clientSocket, response, batchByte, 0);
+		
+	// 	if (writeByte == -1)
+	// 		throw HttpServer::ClientSocketWriteException();
+	// 	else if (writeByte == 0)
+	// 	{
+	// 		// Connection closed by client
+	// 		if (close(clientSocket) == -1)
+	// 			throw HttpServer::FailedToCloseFdException();
+	// 		stopMonitoring(clientSocket);
+	// 	}
+	// 	sentByte += static_cast<int>(writeByte);
+	// }
+	
 	if (writeByte == -1)
 		throw HttpServer::ClientSocketWriteException();
 	else if (writeByte == 0)
@@ -137,7 +167,6 @@ void	HttpServer::handleWrite(int clientSocket)
 	}
 	else
 	{
-		std::cout << "Byte Sent: " << writeByte << std::endl;
 		if (close(clientSocket) == -1)
 			throw HttpServer::FailedToCloseFdException();
 		stopMonitoring(clientSocket);

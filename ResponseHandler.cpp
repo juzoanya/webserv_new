@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 15:22:48 by juzoanya          #+#    #+#             */
-/*   Updated: 2023/12/28 15:32:42 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:25:32 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ std::string ResponseHandler::getContentType(const std::string& filename)
 	return ("application/octet-stream");
 }
 
-std::string	generateSuccessResponse(const std::string& content, const std::string& contentType)
+std::string ResponseHandler::generateSuccessResponse(const std::string& content, const std::string& contentType)
 {
 	std::ostringstream	response;
 	response << "HTTP/1.1 200 OK\r\n";
