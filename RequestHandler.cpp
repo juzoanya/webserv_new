@@ -1,5 +1,14 @@
-
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   RequestHandler.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/27 11:11:40 by juzoanya          #+#    #+#             */
+/*   Updated: 2024/01/04 16:50:46 by juzoanya         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "headers.hpp"
 
@@ -34,7 +43,7 @@ std::string	RequestHandler::handleRequest(const std::string& request)
 				return ("DELETE");
 		}
 		else
-			return ("Error");//generateErrorResponse());
+			return ("Error");//TODO: generate error response for no available method
 	}
 	return ("");
 }
@@ -72,12 +81,14 @@ std::string	RequestHandler::handleGetRequest(const std::string& path)
 		std::vector<std::string>::iterator it;
 		for (it = indexes.begin(); it != indexes.end(); ++it)
 		{
-			std::string	absolutePath = root[0] + *it;
-			std::cout << absolutePath << std::endl;
-			if (fileExists(absolutePath))
-				return (response.getStaticPage(absolutePath));
+			std::string	fullPath = root[0] + *it;
+			std::cout << fullPath << std::endl;
+			if (fileExists(fullPath))
+				return (response.getStaticPage(fullPath));
 		}
 	}
+	else if (isDirectory(path.substr(1)))
+		std::cout << "This is a directory" << std::endl; //TODO: handle directory listing
 	else
 		return (response.getStaticPage(path.substr(1)));
 	return (NULL);
@@ -87,4 +98,14 @@ bool	RequestHandler::fileExists(const std::string& filename)
 {
 	std::ifstream file(filename.c_str());
 	return (file.good());
+}
+
+bool	RequestHandler::isDirectory(const std::string& path)
+{
+	struct stat	fileStat;
+	const char* constPath = path.c_str();
+
+	if (stat(constPath, &fileStat) != 0)
+		return (false);
+	return (S_ISDIR(fileStat.st_mode));
 }

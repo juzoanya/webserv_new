@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2023/12/20 17:25:31 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/04 12:37:58 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/epoll.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <poll.h>
 #include <fcntl.h>
