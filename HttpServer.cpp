@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:12 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/04 19:24:28 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/05 09:29:03 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0), _response("")
 {
 	unsigned short	port = 8082;
+	// TODO: Config handler here to get info for creating all the servers
 
 	this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_serverSocket == -1)
@@ -116,16 +117,16 @@ void	HttpServer::handleRead(int clientSocket)
 	else
 	{
 		std::cout << buffer << std::endl;
-		RequestHandler	handler;
-		std::string	request(buffer, readByte);
-		std::cout << "<______________>" << std::endl;
-		this->_response = handler.handleRequest(request);
+		// RequestHandler	handler;
+		// std::string	request(buffer, readByte);
+		// std::cout << "<______________>" << std::endl;
+		// this->_response = handler.handleRequest(request);
 	}
 }
 
 void	HttpServer::handleWrite(int clientSocket)
 {
-	const char*	response = this->_response.c_str(); //"HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World.";
+	const char*	response = /*this->_response.c_str();*/ "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World.";
 	// size_t	sentByte = 0;
 	// size_t	totalByte = strlen(response);
 

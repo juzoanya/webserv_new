@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:11:40 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/04 18:57:54 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/05 09:21:38 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,8 @@ std::string	RequestHandler::handleGetRequest(const std::string& path)
 	indexes.push_back("index.html");
 	indexes.push_back("index.htm");
 	indexes.push_back("index.php");
-	//TODO: check for the correct dir for the server to handle the request using header and parse it to root
-	root.push_back("/home/jakes/");
+	// TODO: check for the correct dir for the server to handle the request using header and parse it to root
+	root.push_back("/home/jakes/webserv_new/");
 
 	if (path == "/")
 	{

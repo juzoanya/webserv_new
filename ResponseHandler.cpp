@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 15:22:48 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/04 17:25:32 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/05 08:27:16 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ ResponseHandler::~ResponseHandler()
 std::string	ResponseHandler::getStaticPage(const std::string& filename)
 {
 	std::ifstream file(filename.c_str(), std::ios::binary);
-	if (!file)
-	{
-		return (generateErrorResponse(404, "Not Found"));
-	}
+	// if (!file.is_open())
+	// {
+	// 	return (generateErrorResponse(404, "Not Found"));
+	// }
 
 	std::ostringstream content;
 	content << file.rdbuf();
