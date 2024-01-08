@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   HttpConstants.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/03 11:32:31 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/05 09:39:33 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/08 18:53:28 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #ifndef HTTP_CONSTANTS_HPP
 #define HTTP_CONSTANTS_HPP
 

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   HttpStatic.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/02 12:12:22 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/05 09:40:39 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/08 20:26:49 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "headers.hpp"
+#include "HttpStatic.hpp"
 
 
 HttpStatic::HttpStatic( void ) : status(ws_http::STATUS_404_NOT_FOUND), isDirectory(false)
@@ -19,17 +19,8 @@ HttpStatic::HttpStatic( void ) : status(ws_http::STATUS_404_NOT_FOUND), isDirect
 HttpStatic::~HttpStatic( void )
 { }
 
-/*
-
-- was benötigt HttpStatic an Konfiguration um funktionieren zu können?
-- 
-
-*/
-
-void    HttpStatic::setContentByPath( std::string const & filePath, std::string const & requestUri, std::vector<std::string>* indexFiles, std::vector<std::string>* dirListing )
+void    HttpStatic::setContentByPath( std::string const & filePath, std::string const & requestUri, std::vector<std::string> const & indexFiles, bool dirListing )
 {
-    this->_indexFiles = indexFiles;
-    this->_dirListing = dirListing;
     this->isDirectory = false;
     this->status = ws_http::STATUS_404_NOT_FOUND;
     struct stat fileStat;
@@ -38,11 +29,11 @@ void    HttpStatic::setContentByPath( std::string const & filePath, std::string 
     } else if (S_ISREG(fileStat.st_mode)) {
         this->setFile(filePath);
     } else if (S_ISDIR(fileStat.st_mode)) {
-        this->checkDirectory(filePath, requestUri);
+        this->checkDirectory(filePath, requestUri, indexFiles, dirListing);
     }
 }
 
-void    HttpStatic::setFile( std::string const & filePath )
+bool    HttpStatic::setFile( std::string const & filePath )
 {
     std::ifstream   ifs(filePath.c_str(), std::ios::binary | std::ios::ate);
     if (ifs.is_open()) {
@@ -53,13 +44,58 @@ void    HttpStatic::setFile( std::string const & filePath )
         ifs.read(this->fileData.data(), filesize);
         ifs.close();
         this->status = ws_http::STATUS_200_OK;
+        return (true);
+    }
+    return (false);
+}
+
+void    HttpStatic::checkDirectory( std::string const & filePath, std::string const & requestUri, std::vector<std::string> const & indexFiles, bool dirListing)
+{
+    DIR* currDir = opendir(filePath.c_str());
+    if (currDir != NULL) {
+        std::vector< std::pair<std::string, struct stat> > dirEntries;
+        struct dirent *dirElem = NULL;
+        while ((dirElem = readdir(currDir))) {
+            struct stat fileStat;
+            std::string filename = std::string(dirElem->d_name, dirElem->d_namlen);
+            if (filename == "." || filename == "..")
+                continue;
+            std::string filePathFull = filePath + "/" + filename;
+            if (stat(filePathFull.c_str(), &fileStat) == -1 || access(filePathFull.c_str(), R_OK) == -1)
+                continue;
+            if (S_ISREG(fileStat.st_mode)
+            && std::find(indexFiles.begin(), indexFiles.end(), filename) != indexFiles.end()) {
+                this->setFile(filePathFull);
+                return ;
+            }
+            dirEntries.push_back(std::make_pair(filename, fileStat));
+        }
+        closedir(currDir);
+        if (dirListing) {
+            this->setDirListing(requestUri, dirEntries);
+        } else {
+            this->status = ws_http::STATUS_403_FORBIDDEN;
+        }
     }
 }
 
-void    setDirListingHeader(std::stringstream& ss)
+void    HttpStatic::setError(ws_http::statuscodes_t errorStatus, std::string const & filePath)
 {
-    
+    struct stat fileStat;
+    if (!filePath.empty() && stat(filePath.c_str(), &fileStat) == 0 && access(filePath.c_str(), R_OK) == 0
+            && S_ISREG(fileStat.st_mode) && this->setFile(filePath)) {
+            return ;
+    }
+    std::string errPage = "<!doctype html>" CRLF "<html lang=\"en\">" CRLF "<head>" CRLF "<meta charset=\"utf-8\">" CRLF "<title>"
+    + ws_http::statuscodes.at(errorStatus) + "</title>" CRLF "</head>" CRLF "<body>" CRLF "<div style=\"text-align: center;\">" CRLF "<h1>"
+    + ws_http::statuscodes.at(errorStatus) + "</h1>" CRLF "<hr>" CRLF "<p>" WEBSERV_VERSION "</p>" CRLF "</div>" CRLF "</body>" CRLF "</html>" CRLF;
+    this->fileData = std::vector(errPage.begin(), errPage.end());
 }
+
+
+
+
+
 
 void    HttpStatic::setDirListing( std::string requestUri, std::vector< std::pair<std::string, struct stat> >& dirEntries )
 {
@@ -122,35 +158,8 @@ void    HttpStatic::setDirListing( std::string requestUri, std::vector< std::pai
     this->fileData = std::vector(dirstr.begin(), dirstr.end());
 }
 
-void    HttpStatic::checkDirectory( std::string const & filePath, std::string const & requestUri)
-{
-    DIR* currDir = opendir(filePath.c_str());
-    if (currDir != NULL) {
-        std::vector< std::pair<std::string, struct stat> > dirEntries;
-        struct dirent *dirElem = NULL;
-        while ((dirElem = readdir(currDir))) {
-            struct stat fileStat;
-            std::string filename = std::string(dirElem->d_name, dirElem->d_namlen);
-            if (filename == "." || filename == "..")
-                continue;
-            std::string filePathFull = filePath + "/" + filename;
-            if (stat(filePathFull.c_str(), &fileStat) == -1 || access(filePathFull.c_str(), R_OK) == -1)
-                continue;
-            if (S_ISREG(fileStat.st_mode) && this->_indexFiles
-            && std::find(this->_indexFiles->begin(), this->_indexFiles->end(), filename) != this->_indexFiles->end()) {
-                this->setFile(filePathFull);
-                return ;
-            }
-            dirEntries.push_back(std::make_pair(filename, fileStat));
-        }
-        closedir(currDir);
-        if (!this->_dirListing || this->_dirListing->size() != 1 || this->_dirListing->at(0) == "off") {
-            this->status = ws_http::STATUS_403_FORBIDDEN;
-        } else {
-            this->setDirListing(requestUri, dirEntries);
-        }
-    }
-}
+
+
 
 
 

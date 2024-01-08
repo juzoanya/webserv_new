@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   headers.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/05 09:41:33 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/08 20:40:05 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <dirent.h>
 
+
 #include <poll.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -48,6 +49,8 @@
 #include "ResponseHandler.hpp"
 #include "HttpConstants.hpp"
 #include "HttpStatic.hpp"
+#include "ConfigHandler.hpp"
+#include "ConfigParser.hpp"
 
 
 #endif
