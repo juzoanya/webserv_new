@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/08 20:46:05 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/08 21:59:00 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,11 @@ HttpConfig::HttpConfig( ws_config_t* serverDirectives, ws_config_t* locationDire
 HttpConfig::~HttpConfig( void )
 { }
 
-std::pair<std::string, std::vector<std::string> > const &   HttpConfig::getMapValue( std::string const & key, bool exact ) const
+std::pair<const std::string, std::vector<std::string> > const &   HttpConfig::getMapValue( std::string const & key, bool exact ) const
 {
+    ws_config_t::iterator it;
     if (this->_locationDirectives) {
-        ws_config_t::iterator it;
+        // ws_config_t::iterator it;
         if (exact)
             it = this->_locationDirectives->find(key);
         else
@@ -31,7 +32,7 @@ std::pair<std::string, std::vector<std::string> > const &   HttpConfig::getMapVa
             return (*it);
     }
     if (this->_serverDirectives) {
-        ws_config_t::iterator it;
+        // ws_config_t::iterator it;
         if (exact)
             it = this->_locationDirectives->find(key);
         else

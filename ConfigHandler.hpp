@@ -6,14 +6,17 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:02:26 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/08 20:30:51 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/08 22:04:35 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #ifndef CONFIG_HANDLER_HPP
 #define CONFIG_HANDLER_HPP
 
 #include "headers.hpp"
+
+class ConfigParser;
 
 struct Redirect {
     Redirect( ws_http::statuscodes_t  status, std::string const & loc );
@@ -37,12 +40,12 @@ public:
     std::string const & getMimeType( void ) const;
     std::vector<std::string> const & getIndexFile( void ) const;
 private:
-    std::pair<std::string, std::vector<std::string> > const &   getMapValue( std::string const & key, bool exact ) const;
+    std::pair<const std::string, std::vector<std::string> > const &   getMapValue( std::string const & key, bool exact ) const;
     ws_config_t*    _serverDirectives;
     ws_config_t*    _locationDirectives;
     std::string     _filePath;
     std::string     _serverName;
-    std::pair<std::string, std::vector<std::string> > _dummyMapVal;
+    std::pair<const std::string, std::vector<std::string> > _dummyMapVal;
 };
 
 struct  ConfigHandler {

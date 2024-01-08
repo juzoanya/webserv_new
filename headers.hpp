@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/08 20:40:05 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/08 22:16:33 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <vector>
 #include <stack>
 #include <algorithm>
+
+typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 
 #include <exception>
 #include <fstream>
@@ -39,18 +41,18 @@
 #include <unistd.h>
 #include <dirent.h>
 
-
 #include <poll.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "ConfigParser.hpp"
 #include "HttpServer.hpp"
 #include "RequestHandler.hpp"
 #include "ResponseHandler.hpp"
 #include "HttpConstants.hpp"
 #include "HttpStatic.hpp"
 #include "ConfigHandler.hpp"
-#include "ConfigParser.hpp"
+
 
 
 #endif
