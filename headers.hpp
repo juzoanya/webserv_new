@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   headers.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/08 22:16:33 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/11 15:39:36 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,18 +40,19 @@ typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
-
+#include <arpa/inet.h>
 #include <poll.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #include "ConfigParser.hpp"
-#include "HttpServer.hpp"
-#include "RequestHandler.hpp"
 #include "ResponseHandler.hpp"
 #include "HttpConstants.hpp"
-#include "HttpStatic.hpp"
 #include "ConfigHandler.hpp"
+#include "RequestHandler.hpp"
+#include "HttpServer.hpp"
+#include "HttpStatic.hpp"
+
 
 
 

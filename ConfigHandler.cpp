@@ -3,14 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/08 21:59:00 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/11 19:20:35 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.hpp"
+
+HttpConfig::HttpConfig( void )
+ : _serverDirectives(), _locationDirectives(), _filePath(), _serverName()
+{ }
 
 HttpConfig::HttpConfig( ws_config_t* serverDirectives, ws_config_t* locationDirectives, std::string const & filePath, std::string const & serverName)
  : _serverDirectives(serverDirectives), _locationDirectives(locationDirectives), _filePath(filePath), _serverName(serverName)
@@ -19,7 +23,7 @@ HttpConfig::HttpConfig( ws_config_t* serverDirectives, ws_config_t* locationDire
 HttpConfig::~HttpConfig( void )
 { }
 
-std::pair<const std::string, std::vector<std::string> > const &   HttpConfig::getMapValue( std::string const & key, bool exact ) const
+std::pair<const std::string, std::vector<std::string> > const & HttpConfig::getMapValue( std::string const & key, bool exact ) const
 {
     ws_config_t::iterator it;
     if (this->_locationDirectives) {
@@ -149,9 +153,12 @@ std::string const & HttpConfig::getMimeType( void ) const
 
 
 
+ConfigHandler::ConfigHandler( void )
+ //: serverIp(), serverPort()
+{ }
 
-ConfigHandler::ConfigHandler( ConfigParser::ServerContext* newConfig, std::string const & ip, std::string const & port )
- : serverIp(ip), serverPort(port)
+ConfigHandler::ConfigHandler( ConfigParser::ServerContext* newConfig)//, std::string const & ip, std::string const & port )
+ //: serverIp(ip), serverPort(port)
 {
     this->addServerConfig(newConfig);
 }
@@ -159,7 +166,6 @@ ConfigHandler::ConfigHandler( ConfigParser::ServerContext* newConfig, std::strin
 ConfigHandler::~ConfigHandler( void )
 { }
 
-// takes
 std::string getFilePath(ws_config_t* serverDirectives, ws_config_t* locationDirectives, std::string const & pathDecoded, std::string const & location, std::string const & defaultRoot)
 {
     if (locationDirectives) {
@@ -209,6 +215,9 @@ HttpConfig ConfigHandler::getHttpConfig( std::string const & pathDecoded, std::s
     std::string filePath = getFilePath(&currConfig.serverConfig, currLoc, pathDecoded, selectedLocation, defaultRoot);
     return (HttpConfig(&currConfig.serverConfig, currLoc, filePath, hostname));
 }
+
+
+
 
 void    ConfigHandler::addServerConfig(ConfigParser::ServerContext* newConfig)
 {

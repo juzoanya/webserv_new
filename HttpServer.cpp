@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:12 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/05 09:29:03 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/11 16:24:55 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@
 
 HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0), _response("")
 {
-	unsigned short	port = 8082;
+	unsigned short	port = 8083;
+	std::string	host = "server.local";
 	// TODO: Config handler here to get info for creating all the servers
 
 	this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -31,6 +32,8 @@ HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std:
 	this->_serverAddress.sin_family = AF_INET;
 	this->_serverAddress.sin_addr.s_addr = INADDR_ANY;
 	this->_serverAddress.sin_port = htons(port);
+	// if (inet_pton(AF_INET, host.c_str(), &(this->_serverAddress.sin_addr.s_addr)) <= 0)
+	// 	std::cout << "Address not supported" << std::endl;
 
 	// Set the server socket to non-blocking mode
 	fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
@@ -89,8 +92,8 @@ void	HttpServer::start(void)
 			{
 				if (this->_fds[i].revents & (POLLIN | POLLHUP))
 					handleRead(this->_fds[i].fd);
-				if (this->_fds[i].revents & POLLOUT)
-					handleWrite(this->_fds[i].fd);
+				// if (this->_fds[i].revents & POLLOUT)
+				// 	handleWrite(this->_fds[i].fd);
 			}
 		}
 	}
@@ -101,7 +104,6 @@ void	HttpServer::handleRead(int clientSocket)
 	char	buffer[1024];
 
 	ssize_t readByte = recv(clientSocket, buffer, sizeof(buffer), 0);
-	std::cout << readByte << " Bytes of data recieved from " << clientSocket << std::endl;
 	if (readByte == -1)
 	{
 		std::cout << "Error reading from client socket." << strerror(errno) << std::endl;
@@ -116,11 +118,10 @@ void	HttpServer::handleRead(int clientSocket)
 	}
 	else
 	{
-		std::cout << buffer << std::endl;
-		// RequestHandler	handler;
-		// std::string	request(buffer, readByte);
-		// std::cout << "<______________>" << std::endl;
-		// this->_response = handler.handleRequest(request);
+		//std::cout << buffer << std::endl;
+		RequestHandler	handler;
+		std::string	request(buffer, readByte);
+		this->_response = handler.handleRequest(request);
 	}
 }
 
@@ -130,8 +131,8 @@ void	HttpServer::handleWrite(int clientSocket)
 	// size_t	sentByte = 0;
 	// size_t	totalByte = strlen(response);
 
-	std::cout << "Start Sending..." << std::endl;
-	std::cout << response << std::endl;
+	// std::cout << "Start Sending..." << std::endl;
+	// std::cout << response << std::endl;
 	
 	ssize_t writeByte = send(clientSocket, response, strlen(response), 0);
 

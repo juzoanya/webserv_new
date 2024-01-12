@@ -210,10 +210,10 @@ void	ConfigParser::parseConfig(std::vector<std::string>& allConfig)
 	std::vector<std::string>::iterator	it;
 	for (it = allConfig.begin(); it != allConfig.end(); ++it)
 	{
-		std::cout << "\nfor -\n";
-		if (contextControl.size() > 0)
-			std::cout << "contextControl: " << contextControl.top() << std::endl;
-		std::cout << "stack elem: " << *it << std::endl;
+		// std::cout << "\nfor -\n";
+		// if (contextControl.size() > 0)
+		// 	std::cout << "contextControl: " << contextControl.top() << std::endl;
+		// std::cout << "stack elem: " << *it << std::endl;
 
 
 		std::string	line = *it;
@@ -235,13 +235,13 @@ void	ConfigParser::parseConfig(std::vector<std::string>& allConfig)
 			contextControl.pop();
 		} else {
 			if (contextControl.top() == "http {") {
-				std::cout << "parse Directive - http" << std::endl;
+				//std::cout << "parse Directive - http" << std::endl;
 				parseDirective(line, httpConfig);
 			} else if (contextControl.top() == "server {") {
-				std::cout << "parse Directive - server" << std::endl;
+				//std::cout << "parse Directive - server" << std::endl;
 				parseDirective(line, currentConfig);
 			} else if (contextControl.top().find("location ") == 0) {
-				std::cout << "parse Directive - location" << std::endl;
+				//std::cout << "parse Directive - location" << std::endl;
 				parseDirective(line, currentLocConfig);
 			}
 		}
@@ -249,7 +249,7 @@ void	ConfigParser::parseConfig(std::vector<std::string>& allConfig)
 }
 
 
-void	printConfigMap( std::string const & msg, std::map<std::string, std::vector<std::string> > const & config )
+void	ConfigParser::printConfigMap( std::string const & msg, ws_config_t const & config )
 {
 	std::cout << std::endl;
 	std::cout << msg << std::endl;
@@ -270,9 +270,9 @@ void	ConfigParser::configParser(char *file)
 
 	allConfig = processFile(file);
 
-	for (std::size_t i = 0; i != allConfig.size(); ++i) {
-		std::cout << "callConfig string: " << allConfig[i] << std::endl;
-	}
+	// for (std::size_t i = 0; i != allConfig.size(); ++i) {
+	// 	std::cout << "callConfig string: " << allConfig[i] << std::endl;
+	// }
 
 	setServerContext();
 
@@ -281,10 +281,71 @@ void	ConfigParser::configParser(char *file)
 	for (int i = 0; i != this->getServerCount(); ++i) {
 		ServerContext currServerConfig = this->serverConfigs[i];
 		printConfigMap("Server Config: ", currServerConfig.serverConfig);
-		for (std::size_t j = 0; j != currServerConfig.locationConfig.size(); ++j) {
-			printConfigMap("\tLocation Config: " + currServerConfig.locationConfig[j].at("location").at(0) + ": ", currServerConfig.locationConfig[j]);
+		std::vector<ws_config_t>::iterator	it;
+		for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
+			printConfigMap("Location Config: ", *it);
+	}
+}
+
+std::vector<std::string>	ConfigParser::getConfigValue(ServerContext *serverConfig, const std::string& key)
+{
+	ws_config_t::iterator	it;
+	it = serverConfig->serverConfig.find(key);
+	if (it != serverConfig->serverConfig.end())
+		return (it->second);
+	else
+	{
+		std::vector<ws_config_t>::iterator itVec;
+		for (itVec = serverConfig->locationConfig.begin(); itVec != serverConfig->locationConfig.end(); ++itVec)
+		{
+			it = (*itVec).find(key);
+			if (it != (*itVec).end())
+				return (it->second);
+			else
+				std::cout << "Key not found " << std::endl; // TODO: Add exception here.
 		}
 	}
+	return (std::vector<std::string>());
+}
+
+int	ConfigParser::getHandlerConfigIndex(std::string& host, std::string& port)
+{
+	int	servers = getServerCount();
+
+	for (int i = 0; i < servers; ++i)
+	{
+		std::vector<std::string>	serverName = getConfigValue(&this->serverConfigs[i], "server_name");
+		if (serverName.empty())
+		{
+			std::cout << "<............9............>" << std::endl;
+			std::vector<std::string>	listen = getConfigValue(&this->serverConfigs[i], "listen");
+			std::vector<std::string>::iterator	itVec;
+			for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
+			{
+				if ((*itVec).find(host) != std::string::npos && (*itVec).find(port) != std::string::npos)
+					return(i);
+			}
+		}
+		else
+		{
+			std::cout << "<............3............>" << std::endl;
+			std::vector<std::string>::iterator	itVec;
+			for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
+			{
+				if (*itVec == host)
+				{
+					std::vector<std::string>	portString = getConfigValue(&this->serverConfigs[i], "listen");
+					std::vector<std::string>::iterator	itVec;
+					for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
+					{
+						if ((*itVec).find(port) != std::string::npos)
+							return(i);
+					}
+				}
+			}
+		}
+	}
+	return (0);
 }
 
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:58:32 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/08 20:37:46 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/11 17:49:29 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,6 @@ class ConfigParser
 
 		struct ServerContext
 		{
-			// std::map<std::string, std::vector<std::string> >	serverConfig;
-			// std::vector<std::map<std::string, std::vector<std::string> > >	locationConfig;
-			
-			
 			ws_config_t					serverConfig;
 			std::vector<ws_config_t>	locationConfig;
 		};
@@ -51,6 +47,11 @@ class ConfigParser
 		bool	checkBraceBalance(std::vector<std::string> allConfig);
 		void	parseConfig(std::vector<std::string>& allConfig);
 		void	parseDirective(std::string& directive, std::map<std::string, std::vector<std::string> >& contextMap);
+
+		std::vector<std::string>	getConfigValue(ServerContext *serverConfig, const std::string& key);
+		int	getHandlerConfigIndex(std::string& host, std::string& port);
+
+		void	printConfigMap( std::string const & msg, ws_config_t const & config );
 
 
 

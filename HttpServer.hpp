@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:20 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/04 16:58:08 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/11 15:35:16 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,8 @@
 #include "headers.hpp"
 
 class ConfigParser;
-class RequestHandler;
 
-class HttpServer
+class HttpServer : public RequestHandler
 {
 	private:
 		int					_serverSocket;
