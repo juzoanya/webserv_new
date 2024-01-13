@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/11 19:20:35 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/13 15:24:00 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,22 @@ ConfigHandler::ConfigHandler( ConfigParser::ServerContext* newConfig)//, std::st
 ConfigHandler::~ConfigHandler( void )
 { }
 
+/**
+ * @brief Determine the absolute file path based on server and location configurations.
+ *
+ * This function constructs the absolute file path by combining information from
+ * server and location directives along with the decoded path. It first checks if
+ * there are specific location directives; if found, it appends the path to the
+ * specified root. If not, it checks for server directives and appends the path
+ * to the server root. If neither is present, the default root is used.
+ *
+ * @param serverDirectives The server-level configuration directives.
+ * @param locationDirectives The location-level configuration directives (if applicable).
+ * @param pathDecoded The decoded path from the HTTP request.
+ * @param location The location associated with the request.
+ * @param defaultRoot The default root path if neither server nor location directive is present.
+ * @return The absolute file path based on the provided configurations and path.
+ */
 std::string getFilePath(ws_config_t* serverDirectives, ws_config_t* locationDirectives, std::string const & pathDecoded, std::string const & location, std::string const & defaultRoot)
 {
     if (locationDirectives) {
@@ -181,6 +197,21 @@ std::string getFilePath(ws_config_t* serverDirectives, ws_config_t* locationDire
     return (defaultRoot + pathDecoded);
 }
 
+/**
+ * @brief Obtain the HTTP configuration based on the provided request details.
+ *
+ * This function retrieves the appropriate HTTP configuration based on the decoded path,
+ * host header, and default root. It iterates through server configurations to find
+ * a match for the provided hostname. Once a match is found, it further looks for a
+ * matching location within that server configuration. The absolute file path is determined
+ * using the found server and location configurations. The final HTTP configuration
+ * is then constructed and returned.
+ *
+ * @param pathDecoded The decoded path from the HTTP request.
+ * @param hostHeader The Host header from the HTTP request.
+ * @param defaultRoot The default root path to be used if no matching configuration is found.
+ * @return An HttpConfig object representing the appropriate server and location configuration.
+ */
 HttpConfig ConfigHandler::getHttpConfig( std::string const & pathDecoded, std::string const & hostHeader, std::string const & defaultRoot )
 {
     if (this->_serverConfigs.size() == 0)

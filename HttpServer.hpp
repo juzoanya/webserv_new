@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:20 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/11 15:35:16 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/13 16:18:31 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class HttpServer : public RequestHandler
 		struct sockaddr_in	_serverAddress;
 		struct pollfd		_fds[1024];
 		int					_nfds;
-		std::string			_response;
+		std::vector<char>	_response;
 	
 	public:
 		HttpServer();

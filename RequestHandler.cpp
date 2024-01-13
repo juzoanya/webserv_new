@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:11:40 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/11 19:41:03 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/13 16:56:41 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,28 +19,15 @@ RequestHandler::~RequestHandler()
 {}
 
 
-std::string	RequestHandler::handleRequest(const std::string& request)
+std::vector<char>	RequestHandler::handleRequest(const std::string& request)
 {
-	std::cout << "**************************\n" << request << "**************************\n" << std::endl;
+	ConfigHandler	handler;
+	int servCount = ConfigParser::getServerCount();
 	std::string	serverName = getServerName(request);
-	std::cout << serverName << "\n<------------------>" << std::endl;
-
-	size_t pos = serverName.find(':');
-	if (pos != std::string::npos)
-	{
-		this->_host = serverName.substr(0, pos);
-		this->_port = serverName.substr(pos + 1);
-	}
-	else
-	{
-		this->_host = serverName;
-		this->_port = "";
-	}
-	std::cout << this->_host << " | " << this->_port << "\n====================" << std::endl;
-
-
 	std::string	path = getRequestPath(request);
 
+	for (int i = 0; i < servCount; ++i)
+		handler.addServerConfig(&ConfigParser::serverConfigs[i]);
 
 	//get method
 		//if method not found update status code
@@ -53,57 +40,18 @@ std::string	RequestHandler::handleRequest(const std::string& request)
 			//if not update status code
 
 	//Using the server and location config, process the response
+	std::cout << "1-------------------------------" << std::endl;
 
-
-	HttpConfig	httpConfig = ConfigHandler::getHttpConfig(path, serverName, "/var/www");
-
-	this->_handlerConfigIndex = ConfigParser::getHandlerConfigIndex(this->_host, this->_port);
-	std::cout << this->_handlerConfigIndex << std::endl;
-
-	// this->_handlerServConfig = ConfigParser::serverConfigs[this->_handlerConfigIndex].serverConfig;
-	// this->_handlerLocConfig = ConfigParser::serverConfigs[this->_handlerConfigIndex].locationConfig;
-
-
-
-	// std::vector<ws_config_t>::iterator	it;
-	// for (it = this->_handlerLocConfig.begin(); it != this->_handlerLocConfig.end(); ++it)
-	// {
-		
-	// }
+	HttpConfig	httpConfig = handler.getHttpConfig(path, serverName, "");
+	if (!httpConfig.checkAllowedMethod(getRequestMethod(request)))
+		httpConfig.getErrorPage("405");
 	
+	std::cout << "2-------------------------------" << std::endl;
+	HttpStatic	responsePage;
+	responsePage.setContentByPath(path, getRequestPath(request), httpConfig.getIndexFile(), httpConfig.hasDirectoryListing());
 
-	// if (HttpConfig::checkAllowedMethod(getRequestMethod(request)))
-	// {
-	// 	std::cout << "Method Found" << std::endl;
-	// }
-	
-
-
-	// std::string	method = getRequestMethod(request);
-	// std::string	path = getRequestPath(request);
-
-	// std::vector<std::string>	methods;
-	// methods.push_back("GET");
-	// methods.push_back("POST");
-	// methods.push_back("DELETE");
-
-	// std::vector<std::string>::iterator	it;
-	// for (it = methods.begin(); it != methods.end(); ++it)
-	// {
-	// 	if (*it == method)
-	// 	{
-	// 		if (method == "GET")
-	// 			return (handleGetRequest(path));
-	// 		else if (method == "POST")
-	// 			return ("POST");
-	// 		else if (method == "DELETE")
-	// 			return ("DELETE");
-	// 	}
-	// 	else
-	// 		return ("Error");//TODO: generate error response for no available method
-	// }
-	// std::cout << "HR, Done" << std::endl;
-	return ("");
+	std::cout << "3-------------------------------" << std::endl;
+	return (responsePage.fileData);
 }
 
 std::string	RequestHandler::getRequestMethod(const std::string& request)
@@ -137,47 +85,32 @@ std::string	RequestHandler::getServerName (const std::string& request)
 	return (NULL);
 }
 
-std::string	RequestHandler::handleGetRequest(const std::string& path)
-{
-	std::vector<std::string>	indexes;
-	std::vector<std::string>	root;
-	ResponseHandler				response;
+// std::string	RequestHandler::handleGetRequest(const std::string& path)
+// {
+// 	std::vector<std::string>	indexes;
+// 	std::vector<std::string>	root;
+// 	ResponseHandler				response;
 
-	indexes.push_back("index.html");
-	indexes.push_back("index.htm");
-	indexes.push_back("index.php");
-	// TODO: check for the correct dir for the server to handle the request using header and parse it to root
-	root.push_back("/home/jakes/webserv_new/");
+// 	indexes.push_back("index.html");
+// 	indexes.push_back("index.htm");
+// 	indexes.push_back("index.php");
+// 	// TODO: check for the correct dir for the server to handle the request using header and parse it to root
+// 	root.push_back("/home/jakes/webserv_new/");
 
-	if (path == "/")
-	{
-		std::vector<std::string>::iterator it;
-		for (it = indexes.begin(); it != indexes.end(); ++it)
-		{
-			std::string	fullPath = root[0] + *it;
-			std::cout << fullPath << std::endl;
-			return (response.getStaticPage(fullPath));
-		}
-	}
-	else if (isDirectory(path.substr(1)))
-		std::cout << "This is a directory" << std::endl; //TODO: handle directory listing
-	else
-		return (response.getStaticPage(path.substr(1)));
-	return ("");
-}
+// 	if (path == "/")
+// 	{
+// 		std::vector<std::string>::iterator it;
+// 		for (it = indexes.begin(); it != indexes.end(); ++it)
+// 		{
+// 			std::string	fullPath = root[0] + *it;
+// 			std::cout << fullPath << std::endl;
+// 			return (response.getStaticPage(fullPath));
+// 		}
+// 	}
+// 	else if (isDirectory(path.substr(1)))
+// 		std::cout << "This is a directory" << std::endl; //TODO: handle directory listing
+// 	else
+// 		return (response.getStaticPage(path.substr(1)));
+// 	return ("");
+// }
 
-bool	RequestHandler::fileExists(const std::string& filename)
-{
-	std::ifstream file(filename.c_str());
-	return (file.good());
-}
-
-bool	RequestHandler::isDirectory(const std::string& path)
-{
-	struct stat	fileStat;
-	const char* constPath = path.c_str();
-
-	if (stat(constPath, &fileStat) != 0)
-		return (false);
-	return (S_ISDIR(fileStat.st_mode));
-}

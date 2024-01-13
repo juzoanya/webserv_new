@@ -278,75 +278,75 @@ void	ConfigParser::configParser(char *file)
 
 	parseConfig(allConfig);
 
-	for (int i = 0; i != this->getServerCount(); ++i) {
-		ServerContext currServerConfig = this->serverConfigs[i];
-		printConfigMap("Server Config: ", currServerConfig.serverConfig);
-		std::vector<ws_config_t>::iterator	it;
-		for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
-			printConfigMap("Location Config: ", *it);
-	}
+	// for (int i = 0; i != this->getServerCount(); ++i) {
+	// 	ServerContext currServerConfig = this->serverConfigs[i];
+	// 	printConfigMap("Server Config: ", currServerConfig.serverConfig);
+	// 	std::vector<ws_config_t>::iterator	it;
+	// 	for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
+	// 		printConfigMap("Location Config: ", *it);
+	// }
 }
 
-std::vector<std::string>	ConfigParser::getConfigValue(ServerContext *serverConfig, const std::string& key)
-{
-	ws_config_t::iterator	it;
-	it = serverConfig->serverConfig.find(key);
-	if (it != serverConfig->serverConfig.end())
-		return (it->second);
-	else
-	{
-		std::vector<ws_config_t>::iterator itVec;
-		for (itVec = serverConfig->locationConfig.begin(); itVec != serverConfig->locationConfig.end(); ++itVec)
-		{
-			it = (*itVec).find(key);
-			if (it != (*itVec).end())
-				return (it->second);
-			else
-				std::cout << "Key not found " << std::endl; // TODO: Add exception here.
-		}
-	}
-	return (std::vector<std::string>());
-}
+// std::vector<std::string>	ConfigParser::getConfigValue(ServerContext *serverConfig, const std::string& key)
+// {
+// 	ws_config_t::iterator	it;
+// 	it = serverConfig->serverConfig.find(key);
+// 	if (it != serverConfig->serverConfig.end())
+// 		return (it->second);
+// 	else
+// 	{
+// 		std::vector<ws_config_t>::iterator itVec;
+// 		for (itVec = serverConfig->locationConfig.begin(); itVec != serverConfig->locationConfig.end(); ++itVec)
+// 		{
+// 			it = (*itVec).find(key);
+// 			if (it != (*itVec).end())
+// 				return (it->second);
+// 			else
+// 				std::cout << "Key not found " << std::endl; // TODO: Add exception here.
+// 		}
+// 	}
+// 	return (std::vector<std::string>());
+// }
 
-int	ConfigParser::getHandlerConfigIndex(std::string& host, std::string& port)
-{
-	int	servers = getServerCount();
+// int	ConfigParser::getHandlerConfigIndex(std::string& host, std::string& port)
+// {
+// 	int	servers = getServerCount();
 
-	for (int i = 0; i < servers; ++i)
-	{
-		std::vector<std::string>	serverName = getConfigValue(&this->serverConfigs[i], "server_name");
-		if (serverName.empty())
-		{
-			std::cout << "<............9............>" << std::endl;
-			std::vector<std::string>	listen = getConfigValue(&this->serverConfigs[i], "listen");
-			std::vector<std::string>::iterator	itVec;
-			for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
-			{
-				if ((*itVec).find(host) != std::string::npos && (*itVec).find(port) != std::string::npos)
-					return(i);
-			}
-		}
-		else
-		{
-			std::cout << "<............3............>" << std::endl;
-			std::vector<std::string>::iterator	itVec;
-			for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
-			{
-				if (*itVec == host)
-				{
-					std::vector<std::string>	portString = getConfigValue(&this->serverConfigs[i], "listen");
-					std::vector<std::string>::iterator	itVec;
-					for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
-					{
-						if ((*itVec).find(port) != std::string::npos)
-							return(i);
-					}
-				}
-			}
-		}
-	}
-	return (0);
-}
+// 	for (int i = 0; i < servers; ++i)
+// 	{
+// 		std::vector<std::string>	serverName = getConfigValue(&this->serverConfigs[i], "server_name");
+// 		if (serverName.empty())
+// 		{
+// 			std::cout << "<............9............>" << std::endl;
+// 			std::vector<std::string>	listen = getConfigValue(&this->serverConfigs[i], "listen");
+// 			std::vector<std::string>::iterator	itVec;
+// 			for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
+// 			{
+// 				if ((*itVec).find(host) != std::string::npos && (*itVec).find(port) != std::string::npos)
+// 					return(i);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			std::cout << "<............3............>" << std::endl;
+// 			std::vector<std::string>::iterator	itVec;
+// 			for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
+// 			{
+// 				if (*itVec == host)
+// 				{
+// 					std::vector<std::string>	portString = getConfigValue(&this->serverConfigs[i], "listen");
+// 					std::vector<std::string>::iterator	itVec;
+// 					for (itVec = serverName.begin(); itVec != serverName.end(); ++itVec)
+// 					{
+// 						if ((*itVec).find(port) != std::string::npos)
+// 							return(i);
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return (0);
+// }
 
 
 

@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:12 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/11 16:24:55 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/13 16:57:10 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 // 	// SocketAddr_in	serverAddress;
 // }
 
-HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0), _response("")
+HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0)
 {
-	unsigned short	port = 8083;
+	unsigned short	port = 8081;
 	std::string	host = "server.local";
 	// TODO: Config handler here to get info for creating all the servers
 
@@ -122,6 +122,9 @@ void	HttpServer::handleRead(int clientSocket)
 		RequestHandler	handler;
 		std::string	request(buffer, readByte);
 		this->_response = handler.handleRequest(request);
+		std::vector<char>::iterator it;
+		for (it = this->_response.begin(); it != this->_response.end(); ++it)
+			std::cout << *it;
 	}
 }
 

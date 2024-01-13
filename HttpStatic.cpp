@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpStatic.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/02 12:12:22 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/08 22:32:36 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/13 15:21:13 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,19 @@ HttpStatic::HttpStatic( void ) : status(ws_http::STATUS_404_NOT_FOUND), isDirect
 HttpStatic::~HttpStatic( void )
 { }
 
+/**
+ * @brief Set the HttpStatic object content based on the specified file path.
+ *
+ * This function determines the type of content to be set in the HttpStatic object
+ * based on the provided file path. It checks whether the path corresponds to a regular
+ * file, a directory, or if access is forbidden. The appropriate action is taken,
+ * including setting the HTTP status and content accordingly.
+ *
+ * @param filePath The path to the file or directory.
+ * @param requestUri The requested URI associated with the file or directory.
+ * @param indexFiles A vector of index file names to check for in directories.
+ * @param dirListing A boolean flag indicating whether directory listing is enabled.
+ */
 void    HttpStatic::setContentByPath( std::string const & filePath, std::string const & requestUri, std::vector<std::string> const & indexFiles, bool dirListing )
 {
     this->isDirectory = false;
@@ -33,6 +46,16 @@ void    HttpStatic::setContentByPath( std::string const & filePath, std::string 
     }
 }
 
+/**
+ * @brief Set the contents of the HttpStatic object by reading a file.
+ *
+ * This function opens the specified file in binary mode, reads its contents,
+ * and stores the data in the internal fileData member. It also sets the HTTP
+ * status to "200 OK" if the file is successfully read.
+ *
+ * @param filePath The path to the file to be read.
+ * @return true if the file is successfully read and data is set, false otherwise.
+ */
 bool    HttpStatic::setFile( std::string const & filePath )
 {
     std::ifstream   ifs(filePath.c_str(), std::ios::binary | std::ios::ate);
@@ -49,6 +72,20 @@ bool    HttpStatic::setFile( std::string const & filePath )
     return (false);
 }
 
+/**
+ * @brief Check the specified directory for files and handle accordingly.
+ *
+ * This function opens the specified directory, iterates through its entries,
+ * and performs actions based on the contents. If index files are found, it sets
+ * the HttpStatic object to the content of the first index file. If directory listing
+ * is enabled, it displays the directory entries. If directory listing is disabled,
+ * it sets the HTTP status to "403 Forbidden".
+ *
+ * @param filePath The path to the directory to be checked.
+ * @param requestUri The requested URI associated with the directory.
+ * @param indexFiles A vector of index file names to check for.
+ * @param dirListing A boolean flag indicating whether directory listing is enabled.
+ */
 void    HttpStatic::checkDirectory( std::string const & filePath, std::string const & requestUri, std::vector<std::string> const & indexFiles, bool dirListing)
 {
     DIR* currDir = opendir(filePath.c_str());
@@ -79,6 +116,18 @@ void    HttpStatic::checkDirectory( std::string const & filePath, std::string co
     }
 }
 
+/**
+ * @brief Set the HttpStatic object to represent an error response.
+ *
+ * This function populates the HttpStatic object with the content of an error page
+ * based on the provided HTTP status code. If a custom error page file is specified
+ * and is valid, the content of that file is used. Otherwise, a default error page
+ * is generated and set in the HttpStatic object.
+ *
+ * @param errorStatus The HTTP status code representing the error.
+ * @param filePath Optional path to a custom error page file. If empty or invalid,
+ *                 a default error page is generated.
+ */
 void    HttpStatic::setError(ws_http::statuscodes_t errorStatus, std::string const & filePath)
 {
     struct stat fileStat;
@@ -92,11 +141,17 @@ void    HttpStatic::setError(ws_http::statuscodes_t errorStatus, std::string con
     this->fileData = std::vector<char>(errPage.begin(), errPage.end());
 }
 
-
-
-
-
-
+/**
+ * @brief Generate and set the HttpStatic object to represent a directory listing.
+ *
+ * This function generates an HTML representation of a directory listing, including
+ * links to files and additional information such as file sizes and last modified
+ * dates. The generated content is then set in the HttpStatic object.
+ *
+ * @param requestUri The requested URI associated with the directory.
+ * @param dirEntries A vector of directory entries, each containing a filename and
+ *                   file information (struct stat).
+ */
 void    HttpStatic::setDirListing( std::string requestUri, std::vector< std::pair<std::string, struct stat> >& dirEntries )
 {
     std::stringstream ss;
