@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:11:40 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/13 16:56:41 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/16 07:40:01 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,17 @@ std::vector<char>	RequestHandler::handleRequest(const std::string& request)
 
 	for (int i = 0; i < servCount; ++i)
 		handler.addServerConfig(&ConfigParser::serverConfigs[i]);
+	
+
+	// for (int i = 0; i != this->getServerCount(); ++i) {
+	// 	ServerContext currServerConfig = this->serverConfigs[i];
+	// 	printConfigMap("Server Config: ", currServerConfig.serverConfig);
+	// 	std::vector<ws_config_t>::iterator	it;
+	// 	for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
+	// 		printConfigMap("Location Config: ", *it);
+	// }
+
+	HttpConfig::printDirective();
 
 	//get method
 		//if method not found update status code
@@ -46,6 +57,12 @@ std::vector<char>	RequestHandler::handleRequest(const std::string& request)
 	if (!httpConfig.checkAllowedMethod(getRequestMethod(request)))
 		httpConfig.getErrorPage("405");
 	
+
+	std::vector<std::string>	indexes = httpConfig.getIndexFile();
+	std::vector<std::string>::iterator it;
+	for (it = indexes.begin(); it != indexes.end(); ++it)
+		std::cout << *it << std::endl;
+
 	std::cout << "2-------------------------------" << std::endl;
 	HttpStatic	responsePage;
 	responsePage.setContentByPath(path, getRequestPath(request), httpConfig.getIndexFile(), httpConfig.hasDirectoryListing());

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigHandler.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:02:26 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/11 16:08:53 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/16 07:27:08 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ class   HttpConfig {
 		std::string const & getCgiExecutable( void ) const;
 		std::string const & getMimeType( void ) const;
 		std::vector<std::string> const & getIndexFile( void ) const;
+
+		void	printDirective(); // TODO: remove this
 	private:
 		std::pair<const std::string, std::vector<std::string> > const &   getMapValue( std::string const & key, bool exact ) const;
 		ws_config_t*    _serverDirectives;
