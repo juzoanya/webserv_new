@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:12:12 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/13 16:57:10 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/18 20:01:44 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 // 	// SocketAddr_in	serverAddress;
 // }
 
-HttpServer::HttpServer(/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0)
+HttpServer::HttpServer(ConfigParser parser/*ConfigParser::ServerContext serverConfig, std::map<std::string, std::vector<std::string> > httpConfig*/) : _serverSocket(-1), _nfds(0), _parser(parser)
 {
 	unsigned short	port = 8081;
 	std::string	host = "server.local";
@@ -92,8 +92,8 @@ void	HttpServer::start(void)
 			{
 				if (this->_fds[i].revents & (POLLIN | POLLHUP))
 					handleRead(this->_fds[i].fd);
-				// if (this->_fds[i].revents & POLLOUT)
-				// 	handleWrite(this->_fds[i].fd);
+				if (this->_fds[i].revents & POLLOUT)
+					handleWrite(this->_fds[i].fd);
 			}
 		}
 	}
@@ -118,64 +118,76 @@ void	HttpServer::handleRead(int clientSocket)
 	}
 	else
 	{
-		//std::cout << buffer << std::endl;
+		std::cout << buffer << std::endl;
 		RequestHandler	handler;
 		std::string	request(buffer, readByte);
-		this->_response = handler.handleRequest(request);
-		std::vector<char>::iterator it;
-		for (it = this->_response.begin(); it != this->_response.end(); ++it)
-			std::cout << *it;
+		handler.handleRequest(request, this->_parser);
+		// std::vector<char>::iterator getMapValue( std::string const & key, bool exact ) const;
+		// ws_config_t*    _serverDirectives	it;
+		// for (it = this->_response.begin(); it != this->_response.end(); ++it)
+		// 	std::cout << *it;
 	}
 }
 
 void	HttpServer::handleWrite(int clientSocket)
 {
-	const char*	response = /*this->_response.c_str();*/ "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World.";
-	// size_t	sentByte = 0;
-	// size_t	totalByte = strlen(response);
-
-	// std::cout << "Start Sending..." << std::endl;
-	// std::cout << response << std::endl;
+	std::string	file = "/home/jakes/webserv_new/index.html";
+	std::ifstream	buff(file.c_str(), std::ios::binary);
+	if (!buff.is_open())
+		std::cout << "error opening file\n";
 	
-	ssize_t writeByte = send(clientSocket, response, strlen(response), 0);
+	std::ostringstream content;
+	content << buff.rdbuf();
+	buff.close();
 
-	// while (sentByte < totalByte)
+	std::ostringstream	response;
+	response << "HTTP/1.1 200 OK\r\n";
+	response << "Content-Type: " << "text/html" << "\r\n";
+	response << "Content-Length: " << content.str().size() << "\r\n";
+	response << "\r\n";
+	response << content.str();
+	this->_response = response.str();
+	
+	size_t	sentByte = 0;
+	size_t	totalByte = this->_response.size();
+	const char *allResponse = this->_response.c_str();
+
+	while (sentByte < totalByte)
+	{
+		ssize_t writeByte = send(clientSocket, allResponse, strlen(allResponse) - sentByte, 0);
+		//std::cout <<
+		if (sentByte == totalByte)
+			break;
+		if (writeByte == -1)
+			throw HttpServer::ClientSocketWriteException();
+		else if (writeByte == 0)
+		{
+			// Connection closed by client
+			if (close(clientSocket) == -1)
+				throw HttpServer::FailedToCloseFdException();
+			stopMonitoring(clientSocket);
+		}
+		sentByte += static_cast<int>(writeByte);
+	}
+	// if (close(clientSocket) == -1)
+	// 	throw HttpServer::FailedToCloseFdException();
+	// stopMonitoring(clientSocket);
+	
+	// if (writeByte == -1)
+	// 	throw HttpServer::ClientSocketWriteException();
+	// else if (writeByte == 0)
 	// {
-	// 	size_t	remByte = totalByte - sentByte;
-	// 	size_t	batchByte;
-	// 	if (remByte < totalByte)
-	// 		batchByte = remByte;
-	// 	else
-	// 		batchByte = totalByte;
-	// 	ssize_t writeByte = send(clientSocket, response, batchByte, 0);
-		
-	// 	if (writeByte == -1)
-	// 		throw HttpServer::ClientSocketWriteException();
-	// 	else if (writeByte == 0)
-	// 	{
-	// 		// Connection closed by client
-	// 		if (close(clientSocket) == -1)
-	// 			throw HttpServer::FailedToCloseFdException();
-	// 		stopMonitoring(clientSocket);
-	// 	}
-	// 	sentByte += static_cast<int>(writeByte);
+	// 	// Connection closed by client
+	// 	if (close(clientSocket) == -1)
+	// 		throw HttpServer::FailedToCloseFdException();
+	// 	stopMonitoring(clientSocket);
 	// }
-	
-	if (writeByte == -1)
-		throw HttpServer::ClientSocketWriteException();
-	else if (writeByte == 0)
-	{
-		// Connection closed by client
-		if (close(clientSocket) == -1)
-			throw HttpServer::FailedToCloseFdException();
-		stopMonitoring(clientSocket);
-	}
-	else
-	{
-		if (close(clientSocket) == -1)
-			throw HttpServer::FailedToCloseFdException();
-		stopMonitoring(clientSocket);
-	}
+	// else
+	// {
+	// 	if (close(clientSocket) == -1)
+	// 		throw HttpServer::FailedToCloseFdException();
+	// 	stopMonitoring(clientSocket);
+	// }
 }
 
 void	HttpServer::handleAccept()

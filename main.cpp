@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) //(void)
 		// 		std::cout << *it << std::endl;
 			
 		// }
-		HttpServer	server;
+		HttpServer	server(parser);
 		server.start();
 
 	}

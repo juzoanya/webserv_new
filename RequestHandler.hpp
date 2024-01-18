@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:11:51 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/13 16:16:55 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/17 16:06:51 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 class ResponseHandler;
 
-class RequestHandler : public ConfigParser, public HttpConfig, public ConfigHandler
+class RequestHandler : /*public ConfigParser,*/ public HttpConfig, public ConfigHandler
 {
 	private:
 	
@@ -26,10 +26,10 @@ class RequestHandler : public ConfigParser, public HttpConfig, public ConfigHand
 		RequestHandler();
 		~RequestHandler();
 
-		std::vector<char>	handleRequest(const std::string& request);
+		std::vector<char>	handleRequest(const std::string& request, ConfigParser parser);
 		static std::string	getRequestMethod(const std::string& request);
-		static std::string	getRequestPath(const std::string& request);
-		static std::string	getServerName(const std::string& request);
+		static std::string	getRequestUri(const std::string& request);
+		static std::string	getHost(const std::string& request);
 		// static std::string	handleGetRequest(const std::string& path);
 		// static std::string	generateErrorResponse();
 

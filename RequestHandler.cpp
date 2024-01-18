@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/27 11:11:40 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/16 07:40:01 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/18 17:07:41 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,26 +19,29 @@ RequestHandler::~RequestHandler()
 {}
 
 
-std::vector<char>	RequestHandler::handleRequest(const std::string& request)
+std::vector<char>	RequestHandler::handleRequest(const std::string& request, ConfigParser parser)
 {
 	ConfigHandler	handler;
-	int servCount = ConfigParser::getServerCount();
-	std::string	serverName = getServerName(request);
-	std::string	path = getRequestPath(request);
+	std::string		host = getHost(request);
+	std::string		requestUri = getRequestUri(request);
 
-	for (int i = 0; i < servCount; ++i)
-		handler.addServerConfig(&ConfigParser::serverConfigs[i]);
-	
+	std::cout << host << " >>>>>>>>\n";
 
-	// for (int i = 0; i != this->getServerCount(); ++i) {
-	// 	ServerContext currServerConfig = this->serverConfigs[i];
-	// 	printConfigMap("Server Config: ", currServerConfig.serverConfig);
-	// 	std::vector<ws_config_t>::iterator	it;
-	// 	for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
-	// 		printConfigMap("Location Config: ", *it);
+	ConfigParser::ServerContext	handlerServerConfig = parser.getHandlerServer(host);
+
+	// ws_config_t::iterator it;
+	// it = handlerServerConfig.serverConfig.find("server_name");
+	// if (it != handlerServerConfig.serverConfig.end())
+	// {
+	// 	std::vector<std::string> value = it->second;
+	// 	std::vector<std::string>::iterator itv;
+	// 	for (itv = value.begin(); itv != value.end(); ++itv)
+	// 		std::cout << *itv << " | ";
 	// }
 
-	HttpConfig::printDirective();
+
+
+	// handler.addServerConfig(&handlerServerConfig);
 
 	//get method
 		//if method not found update status code
@@ -53,19 +56,27 @@ std::vector<char>	RequestHandler::handleRequest(const std::string& request)
 	//Using the server and location config, process the response
 	std::cout << "1-------------------------------" << std::endl;
 
-	HttpConfig	httpConfig = handler.getHttpConfig(path, serverName, "");
-	if (!httpConfig.checkAllowedMethod(getRequestMethod(request)))
-		httpConfig.getErrorPage("405");
+	HttpConfig	httpConfig;// = handler.getHttpConfig(path, serverName, "");
+
+	httpConfig.setHandlerServerConfig(handlerServerConfig, requestUri);
+
+	std::cout << "1.1-------------------------------" << std::endl;
+	// if (requestUri == "/")
+	// 	httpConfig
+	
+	std::cout << "1.2------------------------------" << std::endl;
+	// if (!httpConfig.checkAllowedMethod(getRequestMethod(request)))
+	// 	httpConfig.getErrorPage("405");
 	
 
-	std::vector<std::string>	indexes = httpConfig.getIndexFile();
-	std::vector<std::string>::iterator it;
-	for (it = indexes.begin(); it != indexes.end(); ++it)
-		std::cout << *it << std::endl;
+	// std::vector<std::string>	indexes = httpConfig.getIndexFile();
+	// std::vector<std::string>::iterator itt;
+	// for (itt = indexes.begin(); itt != indexes.end(); ++itt)
+	// 	std::cout << *itt << std::endl;
 
 	std::cout << "2-------------------------------" << std::endl;
 	HttpStatic	responsePage;
-	responsePage.setContentByPath(path, getRequestPath(request), httpConfig.getIndexFile(), httpConfig.hasDirectoryListing());
+	//responsePage.setContentByPath(path, getRequestPath(request), httpConfig.getIndexFile(), httpConfig.hasDirectoryListing());
 
 	std::cout << "3-------------------------------" << std::endl;
 	return (responsePage.fileData);
@@ -79,7 +90,7 @@ std::string	RequestHandler::getRequestMethod(const std::string& request)
 	return (NULL);
 }
 
-std::string	RequestHandler::getRequestPath(const std::string& request)
+std::string	RequestHandler::getRequestUri(const std::string& request)
 {
 	size_t start = request.find(' ') + 1;
 	size_t end = request.find(' ', start);
@@ -88,7 +99,7 @@ std::string	RequestHandler::getRequestPath(const std::string& request)
 	return (NULL);
 }
 
-std::string	RequestHandler::getServerName (const std::string& request)
+std::string	RequestHandler::getHost (const std::string& request)
 {
 	size_t end;
 	size_t pos = request.find("Host:");

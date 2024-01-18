@@ -186,6 +186,23 @@ void	ConfigParser::parseDirective(std::string& directive, std::map<std::string, 
 
 	if (directive.find(';') != std::string::npos)
 		directive.erase(directive.end() - 1);
+	if (directive.find("location ") == 0 && directive.find('{') != std::string::npos)
+	{
+		directive = directive.erase(0, sizeof("location"));
+		std::string	swap;
+		if (directive.find('=') == 0 || directive.find('~') == 0 || directive.find('^') == 0)
+		{
+			swap = directive.substr(0, directive.find(' '));
+			std::cout << swap << std::endl;
+			directive = directive.erase(0, swap.size());
+			if (directive.find_first_not_of(" \t\r\v") != std::string::npos)
+				directive = directive.substr(directive.find_first_not_of(" \t\r\v"));
+			size_t pos = directive.find(' ');
+			if (pos != std::string::npos)
+				directive.erase(directive.begin() + pos, directive.end());
+			directive = directive + " " + swap;
+		}
+	}
 	std::istringstream	line(directive);
 	line >> key;
 	if (key == "error_page" || key == "return" || key == "location") {
@@ -274,17 +291,19 @@ void	ConfigParser::configParser(char *file)
 	// 	std::cout << "callConfig string: " << allConfig[i] << std::endl;
 	// }
 
+	std::cout << getServerCount() << "\n";
+
 	setServerContext();
 
 	parseConfig(allConfig);
 
-	// for (int i = 0; i != this->getServerCount(); ++i) {
-	// 	ServerContext currServerConfig = this->serverConfigs[i];
-	// 	printConfigMap("Server Config: ", currServerConfig.serverConfig);
-	// 	std::vector<ws_config_t>::iterator	it;
-	// 	for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
-	// 		printConfigMap("Location Config: ", *it);
-	// }
+	for (int i = 0; i != this->getServerCount(); ++i) {
+		ServerContext currServerConfig = this->serverConfigs[i];
+		printConfigMap("Server Config: ", currServerConfig.serverConfig);
+		std::vector<ws_config_t>::iterator	it;
+		for (it = currServerConfig.locationConfig.begin(); it != currServerConfig.locationConfig.end(); ++it)
+			printConfigMap("Location Config: ", *it);
+	}
 }
 
 // std::vector<std::string>	ConfigParser::getConfigValue(ServerContext *serverConfig, const std::string& key)
@@ -366,3 +385,43 @@ void	ConfigParser::configParser(char *file)
 
 // 	return (0);
 // }
+
+
+ConfigParser::ServerContext	ConfigParser::getHandlerServer(const std::string& host)//, ServerContext* configs)
+{
+	// if (configs == nullptr)
+	// 	return ();
+	ConfigParser::ServerContext	defaultConfig;
+	ConfigParser::ServerContext	currConfig;
+	std::string	serverName;
+
+	int	count = getServerCount();
+	size_t	pos = host.find(':');
+	if (pos != std::string::npos)
+	{
+		size_t start = host.find_first_not_of(" \n\r\t");
+		serverName = host.substr(start, pos - 1);
+	}
+	else
+		serverName = host;
+	
+	for (int i = 0; i < count; ++i)
+	{
+		if (i == 0)
+			defaultConfig = this->serverConfigs[i];
+		currConfig = this->serverConfigs[i];
+		std::vector<std::string>	serverNames;
+		ws_config_t::iterator	it;
+		it = currConfig.serverConfig.find("server_name");
+		if (it != currConfig.serverConfig.end())
+			serverNames = it->second;
+		std::vector<std::string>::iterator	itVec;
+		for (itVec = serverNames.begin(); itVec != serverNames.end(); ++itVec)
+		{
+			if (*itVec == serverName){
+				return (currConfig);
+			}
+		}
+	}
+	return (defaultConfig);
+}

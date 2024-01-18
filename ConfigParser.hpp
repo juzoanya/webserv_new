@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:58:32 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/11 17:49:29 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/16 21:32:53 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ class ConfigParser
 
 		void	printConfigMap( std::string const & msg, ws_config_t const & config );
 
-
+		ServerContext	getHandlerServer(const std::string& serverName);//, ServerContext* configs);
 
 		class FileOpeningException : std::exception
 		{

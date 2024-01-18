@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/01/16 07:39:15 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/01/18 15:11:44 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ HttpConfig::HttpConfig( ws_config_t* serverDirectives, ws_config_t* locationDire
 { }
 
 HttpConfig::~HttpConfig( void )
-{ }
+{ 
+	// delete[] this->_serverDirectives;
+	// delete[] this->_locationDirectives;
+}
 
 std::pair<const std::string, std::vector<std::string> > const & HttpConfig::getMapValue( std::string const & key, bool exact ) const
 {
@@ -149,6 +152,34 @@ std::string const & HttpConfig::getMimeType( void ) const
 		return (it->second);
 	it = ws_http::mimetypes.find("");
 	return (it->second);
+}
+
+void	HttpConfig::setHandlerServerConfig(ConfigParser::ServerContext	serverConfigs, std::string& requestUri)
+{
+	this->_serverDirectives = &serverConfigs.serverConfig;
+	//this->_locationDirectives = new ws_config_t[serverConfigs.locationConfig.size()];
+	//int i = 0;
+	std::cout << "*************************************\n";
+	std::vector<ws_config_t>::iterator itvec;
+	for (itvec = serverConfigs.locationConfig.begin(); itvec != serverConfigs.locationConfig.end(); ++itvec)
+	{
+		ws_config_t::iterator	it;
+		for (it = (*itvec).begin(); it != (*itvec).end(); ++it)
+		{
+			if (requestUri.find('/') == 0)
+			{
+				if ((it->first).find('/') != std::string::npos)
+				{
+				std::cout << "found\n";
+				this->_locationDirectives = &(*itvec);
+				break;
+				}
+			}
+			
+		}
+		//i++;
+	}
+	std::cout << "<****************************************>\n";
 }
 
 
@@ -342,35 +373,3 @@ void    ConfigHandler::addServerConfig(ConfigParser::ServerContext* newConfig)
 //     this->setConfiguration(0, request);
 // }
 
-void	HttpConfig::printDirective()
-{
-	
-	for (size_t i = 0; i < this->_serverDirectives->size(); ++i)
-	{
-		std::cout << "START OF SERVER CONFIG\n";
-		ws_config_t::iterator	it;
-		for (it = this->_serverDirectives[i].begin(); it != this->_serverDirectives[i].end(); ++it)
-		{
-			std::cout << "********\n" << (*it).first << "\n********\n";
-			std::vector<std::string> value = (*it).second;
-			std::vector<std::string>::iterator	itvec;
-			for (itvec = value.begin(); itvec != value.end(); ++itvec)
-				std::cout << *itvec << " | ";
-			std::cout << std::endl;
-		}
-	}
-	for (size_t i = 0; i < this->_locationDirectives->size(); ++i)
-	{
-		std::cout << "START OF SERVER CONFIG\n";
-		ws_config_t::iterator	it;
-		for (it = this->_locationDirectives[i].begin(); it != this->_locationDirectives[i].end(); ++it)
-		{
-			std::cout << "********\n" << (*it).first << "\n********\n";
-			std::vector<std::string> value = (*it).second;
-			std::vector<std::string>::iterator	itvec;
-			for (itvec = value.begin(); itvec != value.end(); ++itvec)
-				std::cout << *itvec << " | ";
-			std::cout << std::endl;
-		}
-	}
-}
