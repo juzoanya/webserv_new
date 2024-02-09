@@ -167,13 +167,16 @@ void	ConfigParser::parseConfig(std::vector<std::string>& allConfig)
 
 
 		std::string	line = *it;
+		std::cout << line << std::endl;
+		if (line.find("http {") == 0 || line.find("server {") == 0 || line.find("location {") == 0)
+			line = line.substr(0, line.find('{') + 1);
 		if (line.empty() || line.find('#') == 0)
 			continue;
 		else if (line == "http {" || line == "server {" || line.find("location ") == 0) {
 			contextControl.push(line);
 			if (line == "server {")
 				count++;
-		} else if (line == "}") {
+		} else if (line.find('}') == 0) {
 			if (contextControl.top() == "server {") {
 				serverConfigs[count].serverConfig.swap(currentConfig);
 				currentConfig = std::map<std::string, std::vector<std::string> >();
@@ -196,6 +199,7 @@ void	ConfigParser::parseConfig(std::vector<std::string>& allConfig)
 			}
 		}
 	}
+	
 }
 
 
@@ -219,14 +223,17 @@ void	ConfigParser::configParser(char *file)
 	std::vector<std::string>	allConfig;
 
 	allConfig = processFile(file);
+	std::cout << "config parser PF\n";
 
 	// for (std::size_t i = 0; i != allConfig.size(); ++i) {
 	// 	std::cout << "callConfig string: " << allConfig[i] << std::endl;
 	// }
 
 	setServerContext();
+	std::cout << "config parser SSC\n";
 
 	parseConfig(allConfig);
+	std::cout << "config parser PCCe\n";
 
 	// for (int i = 0; i != this->getServerCount(); ++i) {
 	// 	ServerContext currServerConfig = this->serverConfigs[i];

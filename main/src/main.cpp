@@ -45,8 +45,10 @@ int main(int argc, char* argv[])
 	(void) argc;
 	std::vector<HttpServer>	servers;
 	ConfigParser	config;
+	std::cout << "config parser start\n";
 	try {
 		config.configParser(argv[1]);
+		std::cout << "config parser done\n";
 		createHttpServersByConfig(config, servers);
 		eventLoop(servers);
 	} catch(const std::exception& e) {
