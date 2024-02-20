@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+         #
+#    By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/27 11:12:28 by juzoanya          #+#    #+#              #
-#    Updated: 2024/02/20 11:03:13 by juzoanya         ###   ########.fr        #
+#    Updated: 2024/02/20 16:02:32 by juzoanya         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,6 @@ FILES = \
 		CgiHandler.cpp \
 		ConfigHandler.cpp \
 		ConfigParser.cpp \
-		debugHelpers.cpp \
 		HttpConstants.cpp \
 		HttpHandler.cpp \
 		HttpHeader.cpp \

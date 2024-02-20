@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   headers.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/02/19 20:19:20 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/20 16:01:50 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 #include "HttpHeader.hpp"
 #include "HttpMessage.hpp"
 #include "HttpServer.hpp" // uses IOnHttpMessageBodySize from HttpMessage.hpp
-#include "debugHelpers.hpp"
+//#include "debugHelpers.hpp"
 #include "CgiHandler.hpp"
 #include "HttpHandler.hpp" // uses IParentProcess from CgiHandler.hpp
 
