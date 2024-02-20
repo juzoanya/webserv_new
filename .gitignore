@@ -1,0 +1,9 @@
+.DS_Store
+bin
+build
+archive
+src/FileUpload.cpp
+src/FileUpload.hpp
+src/debugHelpers.cpp
+src/debugHelpers.hpp
+src/HttpHandlerBackup.cpp
