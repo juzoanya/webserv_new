@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:58:32 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/01/19 11:16:41 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/21 10:26:24 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,6 @@ class ConfigParser
 
 		struct ServerContext
 		{
-			// std::map<std::string, std::vector<std::string> >	serverConfig;
-			// std::vector<std::map<std::string, std::vector<std::string> > >	locationConfig;
-			
-			
 			ws_config_t					serverConfig;
 			std::vector<ws_config_t>	locationConfig;
 		};
@@ -51,8 +47,6 @@ class ConfigParser
 		bool	checkBraceBalance(std::vector<std::string> allConfig);
 		void	parseConfig(std::vector<std::string>& allConfig);
 		void	parseDirective(std::string& directive, std::map<std::string, std::vector<std::string> >& contextMap);
-
-
 
 		class FileOpeningException : public std::exception
 		{

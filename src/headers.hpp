@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/02/20 16:01:50 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/21 12:46:14 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,9 @@
 #include <stack>
 #include <algorithm>
 
+#define EMPTY_STRING ""
 #define DEFAULT_ROOT_PATH "/Users/maximilian/coding/c/projects/42coding/62_webserv/62_03_webserv_group_small/webserv/www"
 typedef std::string   buff_t;
-// typedef std::vector<char>   buff_t;
-// typedef std::array<char, 4096> buff_t;
 typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 
 #include <exception>
@@ -32,7 +31,6 @@ typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 #include <sstream>
 #include <cctype>
 #include <queue>
-//#include <array>
 #include <bitset>
 
 #include <cstdlib>
@@ -59,14 +57,12 @@ typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 
 #include "HttpConstants.hpp"
 #include "utils.hpp"
-// #include "FileUpload.hpp"
 #include "Polling.hpp"
 #include "ConfigParser.hpp"
 #include "ConfigHandler.hpp"
 #include "HttpHeader.hpp"
 #include "HttpMessage.hpp"
 #include "HttpServer.hpp" // uses IOnHttpMessageBodySize from HttpMessage.hpp
-//#include "debugHelpers.hpp"
 #include "CgiHandler.hpp"
 #include "HttpHandler.hpp" // uses IParentProcess from CgiHandler.hpp
 

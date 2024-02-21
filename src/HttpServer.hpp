@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpServer.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 13:20:12 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/14 07:31:23 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/21 10:16:29 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 class HttpServer : public APollEventHandler, public IOnHttpMessageBodySize {
     public:
         HttpServer( WsIpPort const & ipPort, Polling & polling );
-        // HttpServer( WsIpPort const & ipPort, Polling & polling, ConfigParser::ServerContext const & serverContext );
         ~HttpServer( void );
 
         const WsIpPort  serverIpPort;
@@ -40,6 +39,7 @@ class HttpServer : public APollEventHandler, public IOnHttpMessageBodySize {
         struct AcceptConnectionException        : public std::exception { const char *what() const throw() { return ("Error accepting connection."); } };
         struct FailedToCloseFdException         : public std::exception { const char *what() const throw() { return ("Error closing file descriptor."); } };
         struct SetSocketNonBlockingexception    : public std::exception { const char *what() const throw() { return ("Error setting Socket non-blocking."); } };
+
     private:
         std::vector<ConfigParser::ServerContext const *>   _serverConfigs;
 };
