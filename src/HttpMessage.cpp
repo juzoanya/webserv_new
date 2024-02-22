@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 11:31:42 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 20:18:38 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/22 22:12:02 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,7 +242,6 @@ int     HttpMessage::readFromSocketAndParseHttp( int socketfd, int flags )
 {
 	int readBytes = recv(socketfd, readBuffer, readBufferSize, flags);
 	const std::string loggingString = std::string(readBuffer, readBufferSize);
-	logging("\n-------- data read ---------\n", loggingString , "\n------------------------------", EMPTY_STRING, EMPTY_STRING);
 	if (readBytes == -1 || readBytes == 0)
 		return (readBytes);
 	if (_status != ws_http::STATUS_UNDEFINED)

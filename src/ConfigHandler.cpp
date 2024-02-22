@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 20:38:26 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/22 21:08:32 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,13 +109,13 @@ std::string const & HttpConfig::getRootPath( void ) const
 
 long HttpConfig::getMaxBodySize( void ) const
 {
-	std::pair<const std::string, std::vector<std::string> > const & value = this->getMapValue("client_max_body_size", true);
-	if (value.second.size() == 1) {
-		char* rest;
-		long size = std::strtol(value.second[0].c_str(), &rest, 10);
-		std::string unit(rest);
-		return (unit == "M" ? size * 1000000 : unit == "K" ? size * 1000 : unit == "" ? size : 4096);
-	}
+	//std::pair<const std::string, std::vector<std::string> > const & value = this->getMapValue("client_max_body_size", true);
+	// if (value.second.size() == 1) {
+	// 	char* rest;
+	// 	long size = std::strtol(value.second[0].c_str(), &rest, 10);
+	// 	std::string unit(rest);
+	// 	return (unit == "M" ? size * 1000000 : unit == "K" ? size * 1000 : unit == "" ? size : 4096);
+	// }
 	return (4096);
 }
 

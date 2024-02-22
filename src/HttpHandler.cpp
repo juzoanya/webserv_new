@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 20:30:42 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/22 22:12:11 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,10 @@ void    HttpHandler::handleEvent( struct pollfd & pollfd )
 			logging("\n -------- handleEvent - quit - readBytes: ", readBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		}
-		if (_httpMessage.getStatus() != ws_http::STATUS_UNDEFINED)
+		if (_httpMessage.getStatus() == ws_http::STATUS_200_OK)
 			processResponse(_httpMessage.getStatus());
+		else if (_httpMessage.getStatus() != ws_http::STATUS_UNDEFINED)
+			_httpMessage.setResponse(_httpMessage.getStatus(), NULL, "", "");
 	}
 	if (pollfd.revents & POLLOUT && _httpMessage.responseSet() && !_httpMessage.isCgi()) {
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
@@ -63,6 +65,8 @@ void    HttpHandler::handleEvent( struct pollfd & pollfd )
 			return (quit());
 		} else if (sendBytes == 0) {
 			logging("\n ------- RESPONSE SENT, RESET HTTP MESSAGE ------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+			// if (_httpMessage.getStatus() >= ws_http::STATUS_400_BAD_REQUEST)
+			// 	return (quit());
 			_httpMessage = HttpMessage(&_server);
 		}
 	}
