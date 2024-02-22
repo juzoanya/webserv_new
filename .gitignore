@@ -8,3 +8,4 @@ src/FileUpload.hpp
 src/debugHelpers.cpp
 src/debugHelpers.hpp
 src/HttpHandlerBackup.cpp
+favicon.ico

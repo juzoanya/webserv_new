@@ -6,7 +6,7 @@
 #    By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/27 11:12:28 by juzoanya          #+#    #+#              #
-#    Updated: 2024/02/20 16:02:32 by juzoanya         ###   ########.fr        #
+#    Updated: 2024/02/22 22:21:19 by juzoanya         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ TFILES = \
 		HttpRequestTest.cpp
 
 BIN_DIR	=	bin
+BIN     =   $(addprefix $(BIN_DIR)/, $(NAME))
 OBJ_DIR	=	build
 SRC_DIR	=	src
 SRC		=	$(addprefix $(SRC_DIR)/, $(FILES))
@@ -48,7 +49,7 @@ HEADERS = headers.hpp
 INCS = .
 
 
-all: $(NAME)
+all: $(BIN)
 
 reqTest: $(REQUEST_TEST_OBJ)
 	@$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/$@
@@ -59,8 +60,8 @@ echos:
 echoo:
 	echo -n $(OBJ)
 
-$(NAME): $(OBJ) | $(BIN_DIR)
-	@$(CC) $(CFLAGS) -I$(INCS) $(OBJ) -o $(BIN_DIR)/$(NAME)
+$(BIN): $(OBJ) | $(BIN_DIR)
+	@$(CC) $(CFLAGS) -I$(INCS) $(OBJ) -o $@
 	@echo "$(NAME) created!"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
@@ -83,7 +84,7 @@ clean:
 	@/bin/rm -r $(OBJ_DIR)
 
 fclean: clean
-	@/bin/rm -f $(BIN_DIR)/$(NAME)
+	@/bin/rm -f $(BIN)
 
 re: fclean all
 
