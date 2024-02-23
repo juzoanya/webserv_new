@@ -232,9 +232,6 @@ void	ConfigParser::configParser(char *file)
 	std::vector<std::string>	allConfig;
 
 	allConfig = processFile(file);
-	std::cout << "processing done\n"; 
 	setServerContext();
-	std::cout << "context setting done\n"; 
 	parseConfig(allConfig);
-	std::cout << "parsing done\n"; 
 }
