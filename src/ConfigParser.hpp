@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:58:32 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/02/21 10:26:24 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 10:48:44 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class ConfigParser
 		{
 			public:
 				const char* what() const throw(){
-					return ("Invaline Context or Directive.");
+					return ("Invalid Context or Directive.");
 				}
 		};
 

@@ -76,10 +76,20 @@ std::vector<std::string>	ConfigParser::processFile(char *file)
 	return(allConfig);
 }
 
+
 bool	ConfigParser::isValidContextOrDirective(const std::string& line)
 {
 	if (line.find("http {") == 0 || line.find("server {") == 0 || line.find("location ") == 0)
-			return (true);
+	{
+		std::string lineSubString = line.substr(line.find('{') + 1);
+		if (!lineSubString.empty())
+		{
+			lineSubString.erase(0, lineSubString.find_first_not_of(" \t\n\r\f\v"));
+			if (!lineSubString.empty() && (lineSubString.find('#') != 0 || lineSubString.find('#') == std::string::npos))
+				return (false);
+		}
+		return (true);
+	}
 	size_t	commentPos = line.find('#');
 	if (commentPos != std::string::npos)
 	{
@@ -92,8 +102,28 @@ bool	ConfigParser::isValidContextOrDirective(const std::string& line)
 			commentSubString.find("location ") != std::string::npos)
 			return (false);
 	}
-	if (line.find(';') != std::string::npos || line.find('}') != std::string::npos)
+	if (line.find(';') != std::string::npos)
+	{
+		std::string lineSubString = line.substr(line.find(';') + 1);
+		if (!lineSubString.empty())
+		{
+			lineSubString.erase(0, lineSubString.find_first_not_of(" \t\n\r\f\v"));
+			if (!lineSubString.empty() && (lineSubString.find('#') != 0 || lineSubString.find('#') == std::string::npos))
+				return (false);
+		}
 		return (true);
+	}
+	else if (line.find('}') != std::string::npos)
+	{
+		std::string lineSubString = line.substr(line.find('}') + 1);
+		if (!lineSubString.empty())
+		{
+			lineSubString.erase(0, lineSubString.find_first_not_of(" \t\n\r\f\v"));
+			if (!lineSubString.empty() && (lineSubString.find('#') != 0 || lineSubString.find('#') == std::string::npos))
+				return (false);
+		}
+		return (true);
+	}
 	return (false);
 }
 
@@ -107,9 +137,15 @@ bool	ConfigParser::checkBraceBalance(std::vector<std::string> allConfig)
 		if ((*it).empty() || (*it).find('#') == 0)
 			continue;
 		if ((*it).find('{') != std::string::npos)
+		{
+			if ((*it).find('#') != std::string::npos && (*it).find('{') > (*it).find('#'))
+				continue;
 			braces.push('{');
+		}
 		else if ((*it).find('}') == 0)
 		{
+			if ((*it).find('#') != std::string::npos && (*it).find('}') > (*it).find('#'))
+				continue;
 			if (braces.empty())
 				return (false);
 			braces.pop();
@@ -134,7 +170,7 @@ void	ConfigParser::parseDirective(std::string& directive, std::map<std::string, 
 	std::vector<std::string>	value;
 
 	if (directive.find(';') != std::string::npos)
-		directive.erase(directive.end() - 1);
+		directive.erase(directive.find(';'));
 	std::istringstream	line(directive);
 	line >> key;
 	if (key == "error_page" || key == "return" || key == "cgi") {
@@ -163,7 +199,9 @@ void	ConfigParser::parseConfig(std::vector<std::string>& allConfig)
 		std::string	line = *it;
 		if (line.empty() || line.find('#') == 0)
 			continue;
-		else if (line == "http {" || line == "server {" || line.find("location ") == 0) {
+		else if (line.find("http {") == 0 || line.find("server {") == 0 || line.find("location ") == 0)
+		{
+			line = line.erase(line.find('{') + 1);
 			contextControl.push(line);
 			if (line == "server {")
 				count++;
@@ -194,6 +232,9 @@ void	ConfigParser::configParser(char *file)
 	std::vector<std::string>	allConfig;
 
 	allConfig = processFile(file);
+	std::cout << "processing done\n"; 
 	setServerContext();
+	std::cout << "context setting done\n"; 
 	parseConfig(allConfig);
+	std::cout << "parsing done\n"; 
 }
