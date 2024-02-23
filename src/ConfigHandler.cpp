@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/22 21:08:32 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 12:26:36 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ Redirect HttpConfig::getRedirection( void ) const
 	std::size_t i = value.first.find("return");
 	if (i == 0 && value.second.size() == 1) {
 		int redirStatus;
-		std::stringstream ss(value.first.substr(i, 6));
+		std::stringstream ss(value.first.substr(6, std::string::npos));
 		ss >> redirStatus;
 		if (redirStatus >= ws_http::STATUS_300_MULTIPLE_CHOICES && redirStatus <= ws_http::STATUS_308_PERMANENT_REDIRECT )
 			return (Redirect(static_cast<ws_http::statuscodes_t>(redirStatus), value.second[0]));
