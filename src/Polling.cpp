@@ -6,11 +6,14 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:04:21 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 20:57:20 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 13:48:33 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.hpp"
+
+
+volatile std::sig_atomic_t    Polling::pollterminator = 0;
 
 
 std::string getPollEvent(short events)
@@ -154,7 +157,7 @@ void    Polling::startPolling( void )
 	int poll_timeout = -1;
 	if (timeout_ms > 0)
 		poll_timeout = 200;
-	while (true) {
+	while (Polling::pollterminator == 0) {
 		std::size_t currSize = _pollFds.size();
 		int ret = poll(_pollFds.data(), currSize, poll_timeout);
 		if (ret == -1 && errno == EINTR)
@@ -176,4 +179,6 @@ void    Polling::startPolling( void )
 				_pollEventHandlers[i]->handleEvent(_pollFds[i]);
 		}
 	}
+	for (std::size_t i = 0; i != _pollFds.size(); ++i)
+		delete _pollEventHandlers[i];
 }

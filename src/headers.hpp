@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 19:34:27 by juzoanya          #+#    #+#             */
-/*   Updated: 2024/02/21 12:46:14 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 13:40:41 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 #include <unistd.h>
 #include <dirent.h>
 #include <limits>
-#include <signal.h>
+#include <csignal>
 #include <sys/wait.h>
 
 #include <poll.h>

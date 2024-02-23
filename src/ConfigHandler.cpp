@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/23 12:31:29 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 16:01:19 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,21 +72,24 @@ std::pair<const std::string, std::vector<std::string> > const &   HttpConfig::ge
 	if (this->_locationDirectives) {
 		if (exact) {
 			it = this->_locationDirectives->find(key);
+			if (it != this->_locationDirectives->end())
+				return (*it);
 		} else {
 			it = this->_locationDirectives->lower_bound(key);
-		}
-		if (it != this->_locationDirectives->end()) {
-			return (*it);
+			if (it != this->_locationDirectives->end() && it->first.find(key) == 0)
+				return (*it);
 		}
 	}
 	if (this->_serverDirectives) {
 		if (exact) {
 			it = this->_serverDirectives->find(key);
-		} else {
-			it = this->_serverDirectives->lower_bound(key);
+			if (it != this->_serverDirectives->end())
+				return (*it);
 		}
-		if (it != this->_serverDirectives->end()) {
-			return (*it);
+		else {
+			it = this->_serverDirectives->lower_bound(key);
+			if (it != this->_serverDirectives->end() && it->first.find(key) == 0)
+				return (*it);
 		}
 	}
 	return (this->_dummyMapVal);
@@ -109,13 +112,13 @@ std::string const & HttpConfig::getRootPath( void ) const
 
 long HttpConfig::getMaxBodySize( void ) const
 {
-	//std::pair<const std::string, std::vector<std::string> > const & value = this->getMapValue("client_max_body_size", true);
-	// if (value.second.size() == 1) {
-	// 	char* rest;
-	// 	long size = std::strtol(value.second[0].c_str(), &rest, 10);
-	// 	std::string unit(rest);
-	// 	return (unit == "M" ? size * 1000000 : unit == "K" ? size * 1000 : unit == "" ? size : 4096);
-	// }
+	std::pair<const std::string, std::vector<std::string> > const & value = this->getMapValue("client_max_body_size", true);
+	if (value.second.size() == 1) {
+		char* rest;
+		long size = std::strtol(value.second[0].c_str(), &rest, 10);
+		std::string unit(rest);
+		return (unit == "M" ? size * 1000000 : unit == "K" ? size * 1000 : unit == "" ? size : 4096);
+	}
 	return (4096);
 }
 

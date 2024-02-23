@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 11:31:42 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/22 22:12:02 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 14:03:20 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ ws_http::statuscodes_t  HttpMessage::parseBody(const char* start, const char* en
 			return (ws_http::STATUS_200_OK);
 		}
 	} else {
+		std::cout << "parseBodyChunk" << std::endl;
 		for (; start != end; ++start) {
 			ws_http::statuscodes_t status;
 			if (_state & PARSE_SIZE)
@@ -257,6 +258,7 @@ int     HttpMessage::readFromSocketAndParseHttp( int socketfd, int flags )
 			_state |= HEADER_DONE;
 			if (_maxBodySizeGetter)
 				_maxBodySize = (*_maxBodySizeGetter)(header.getHeader("host"), header.getHeader("@pathdecoded"));
+			std::cout << "max body size: " << _maxBodySize << std::endl;
 			if (_state & MAKE_CGI) {
 				_contentLength = std::numeric_limits<std::size_t>::max();
 				_maxBodySize = std::numeric_limits<std::size_t>::max();

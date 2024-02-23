@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:00:38 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 10:15:50 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 13:42:29 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class Polling {
 		void    startPolling( void );
 
 		unsigned int timeout_ms;
+		volatile static std::sig_atomic_t    pollterminator;
 
 	private:
 		std::vector<struct pollfd>      _pollFds;

@@ -171,6 +171,7 @@ void	ConfigParser::parseDirective(std::string& directive, std::map<std::string, 
 
 	if (directive.find(';') != std::string::npos)
 		directive.erase(directive.find(';'));
+	std::cout << directive << std::endl;
 	std::istringstream	line(directive);
 	line >> key;
 	if (key == "error_page" || key == "return" || key == "cgi") {

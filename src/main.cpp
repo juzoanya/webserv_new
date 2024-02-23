@@ -13,6 +13,13 @@ void	sigchild_handler(int sig)
 	write(1, "CHILD TERMINATED\n", 18);
 }
 
+void    sigint_handler(int sig)
+{
+	if (sig != SIGINT)
+		return ;
+	Polling::pollterminator = 1;
+}
+
 
 WsIpPort	getServerIpPort( ws_config_t const & serverDirectives )
 {
@@ -64,10 +71,17 @@ int main(int argc, char* argv[])
 		if (serversCreated == 0)
 			new HttpServer(WsIpPort("0.0.0.0", "80"), polling);
 		signal(SIGCHLD, sigchild_handler);
+		signal(SIGINT, sigint_handler);
 		polling.startPolling();
 	} catch(const std::exception& e) {
 		std::cerr << e.what() << '\n';
 	}
 	return (0);
 }
+
+
+
+
+
+
 

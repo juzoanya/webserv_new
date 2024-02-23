@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 13:20:20 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 10:18:31 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/23 13:09:29 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,19 +83,29 @@ HttpConfig HttpServer::getHttpConfig( std::string const & pathDecoded, std::stri
 
 void HttpServer::handleEvent( struct pollfd & pollfd )
 {
-	if (pollfd.revents & POLLIN) {
-		struct sockaddr	addr;
-		socklen_t   	addrlen = sizeof(addr);
-		int	clientSocket = accept(pollfd.fd, &addr, &addrlen);
-		if (clientSocket == -1)
-			throw HttpServer::AcceptConnectionException();
-		if (fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1) {
-			close(clientSocket);
-			throw HttpServer::SetSocketNonBlockingexception();
+	if (!(pollfd.revents & POLLIN))
+		return ;
+	try {
+		while (true) {
+			struct sockaddr    addr;
+			socklen_t       addrlen = sizeof(addr);
+			int    clientSocket = accept(pollfd.fd, &addr, &addrlen);
+			if (clientSocket == -1)
+			{
+				if (errno == EINVAL)
+					return;
+				throw HttpServer::AcceptConnectionException();
+			}
+			if (fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1) {
+				close(clientSocket);
+				throw HttpServer::SetSocketNonBlockingexception();
+			}
+			WsIpPort ipPortData(*reinterpret_cast<struct sockaddr_in*>(&addr));
+			HttpHandler *newHandler = new HttpHandler(ipPortData, _polling, *this);
+			_polling.startMonitoringFd(clientSocket, POLLIN | POLLOUT, newHandler, true);
 		}
-		WsIpPort ipPortData(*reinterpret_cast<struct sockaddr_in*>(&addr));
-		HttpHandler *newHandler = new HttpHandler(ipPortData, _polling, *this);
-		_polling.startMonitoringFd(clientSocket, POLLIN | POLLOUT, newHandler, true);
+	} catch(const std::exception& e) {
+		std::cerr << e.what() << '\n';
 	}
 }
 
