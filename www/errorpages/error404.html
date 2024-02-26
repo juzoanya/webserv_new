@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 Error - Page Not Found</title>
+  <style>
+    /* CSS-Styling für die Fehlerseite */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpolygon points='15,40 25,10 35,40' fill='%234CAF50'/%3E%3Crect x='23' y='40' width='4' height='10' fill='%234CAF50'/%3E%3Crect x='40' y='30' width='20' height='20' fill='%232196F3'/%3E%3Crect x='45' y='25' width='10' height='5' fill='%23fff'/%3E%3Cpolygon points='40,30 50,25 60,30 50,35' fill='%23FFC107'/%3E%3Ccircle cx='80' cy='20' r='10' fill='%23E91E63'/%3E%3C/svg%3E");
+      background-size: 100px 100px;
+
+    }
+    .error-container {
+      text-align: center;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 1); /* Hintergrundfarbe der Box */
+      border-radius: 10px; /
+    }
+    h1 {
+      font-size: 8em;
+      margin: 10px 0;
+      color: #333;
+    }
+    p {
+      font-size: 1.5em;
+      color: #666;
+    }
+    .home-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #3498db;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .home-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <h1>404</h1>
+    <p>Oops! Page not found.</p>
+    <a href="/" class="home-btn">Go to Home</a>
+  </div>
+</body>
+</html>

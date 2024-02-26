@@ -1,5 +1,9 @@
 .DS_Store
 bin
+conf/webserv_max_port_test.conf
+conf/webserv_max.conf
+www/example.org
+tester
 build
 archive
 src/FileUpload.cpp

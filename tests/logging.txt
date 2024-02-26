@@ -1,0 +1,77 @@
+
+
+Legende:
+⭕️ log info
+
+CgiHandler
+- Syscalls
+    - (sys) socketpair ⭕️
+    - (sys) fork ⭕️
+    - (sys) chdir ⭕️
+    - (sys) dup2 ⭕️
+    - (sys) close ⭕️
+    - (sys) execve ⭕️??
+    - (sys) fcntl ⭕️
+- Memory Usage
+    - (c++) vector push_back
+
+ConfigHandler
+--
+
+ConfigParser
+- Memory Usage
+    - (c++) new operator
+    - (c++) ifstream
+
+HttpConstants
+- Memory Usage
+    - (c++) map insert?
+
+HttpHandler
+- Memory Usage
+    - (c++) new oparator
+- Syscalls
+    - (c++) ifstream
+    - (c++) ofstream
+
+HttpHeader
+- Memory Usage
+    - (c++) vector resize
+    - (c++) vector push_back
+    - (c++) string push_back
+
+HttpMessage
+- Memory Usage
+    - (c++) string push_back
+- Syscalls
+    - (sys) recv ⭕️
+    - (sys) send ⭕️
+
+HttpServer
+- Syscalls
+    - (sys) accept ⭕️
+    - (sys) fcntl ⭕️
+    - (sys) close ⭕️
+
+Polling
+- Memory Usage
+    - (c++) vector push_back
+- Syscalls
+    - (sys) close ⭕️
+    - (sys) poll ⭕️
+
+FileInfo
+- Syscalls
+    - (sys) stat ⭕️
+    - (sys) access ⭕️
+    - (sys) opendir ⭕️
+    - (sys) readdir ⭕️
+    - (sys) closedir??
+- Memory Usage
+    - (sys) opendir
+    - (c++) vector push_back
+
+WsIpPort
+- THROW:
+    - invalid ip address
+    - invalid port
