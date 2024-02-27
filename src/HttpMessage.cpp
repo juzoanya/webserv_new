@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpMessage.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 11:31:42 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:56:08 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/27 21:37:38 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,7 @@ void    HttpMessage::setCgiResponseDone( void )
 	}
 	_buffer2 += "content-length: " + toStr(_maxBodySize) + ws_http::crlf;
 	_buffer2 += ws_http::crlf;
+	printMessage(4);
 
 	_state &= ~MAKE_CGI;
 	_state |= RESPONSE_SET;
@@ -241,6 +242,7 @@ void    HttpMessage::setResponse( ws_http::statuscodes_t status, std::istream *d
 int     HttpMessage::readFromSocketAndParseHttp( int socketfd, int flags )
 {
 	int readBytes = recv(socketfd, readBuffer, readBufferSize, flags);
+	//std::cout << "<-----------READ-------------->\n" << std::string(readBuffer, 200) << "\n<------------------------>\n";
 	const std::string loggingString = std::string(readBuffer, readBufferSize);
 	if (readBytes == -1 || readBytes == 0)
 		return (readBytes);
@@ -277,6 +279,7 @@ int     HttpMessage::sendDataToSocket( int socketfd, int flags )
 	if (_contentLength == 0)
 		return (0);
 	int sendBytes = send(socketfd, _dataPtr, _contentLength, flags);
+	//std::cout << "<---------SEND--------->\n" << std::string(_dataPtr, 400) << "\n<----------------------->\n";
 	if (sendBytes == -1 || sendBytes == 0)
 		return (sendBytes);
 	_dataPtr += sendBytes;

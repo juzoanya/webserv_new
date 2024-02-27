@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpConstants.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/03 11:32:31 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:43:45 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/27 21:26:27 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ namespace ws_http {
 		STATUS_431_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
 		STATUS_500_INTERNAL_SERVER_ERROR = 500,
 		STATUS_501_NOT_IMPLEMENTED = 501,
+		STATUS_502_BAD_GATEWAY = 502,
 		STATUS_503_SERVICE_UNAVAILABLE = 503,
 		STATUS_505_HTTP_VERSION_NOT_SUPPORTED = 505,
 		STATUS_1001_INTERNAL_REDIRECT = 1001

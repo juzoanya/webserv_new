@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpConstants.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juzoanya <juzoanya@student.42wolfsburg,    +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/03 11:39:38 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/21 10:26:00 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/27 21:27:44 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,7 @@ namespace ws_http {
 			httpStatusCodeMap["429 Too Many Requests"]                  = STATUS_429_TOO_MANY_REQUESTS;
 			httpStatusCodeMap["431 Request Header Fields Too Large"]    = STATUS_431_REQUEST_HEADER_FIELDS_TOO_LARGE;
 			httpStatusCodeMap["500 Internal Server Error"]              = STATUS_500_INTERNAL_SERVER_ERROR;
+			httpStatusCodeMap["502 Bad Gateway"]						= STATUS_502_BAD_GATEWAY;
 			httpStatusCodeMap["501 Not Implemented"]                    = STATUS_501_NOT_IMPLEMENTED;
 			httpStatusCodeMap["503 Service Unavailable"]                = STATUS_503_SERVICE_UNAVAILABLE;
 			httpStatusCodeMap["505 HTTP Version Not Supported"]         = STATUS_505_HTTP_VERSION_NOT_SUPPORTED;

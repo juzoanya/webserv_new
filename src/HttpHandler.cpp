@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 22:55:24 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/27 21:29:54 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,12 @@ void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 		return (quitCgiProcess());
 	}
 	if (pollfd.revents & POLLIN && !_httpMessage.responseSet() && _httpMessage.isCgi()) {
-	   int readBytes = _httpMessage.readFromSocketAndParseHttp(pollfd.fd, 0);
+		int readBytes = _httpMessage.readFromSocketAndParseHttp(pollfd.fd, 0);
+		if (_httpMessage.getStatus() >= ws_http::STATUS_400_BAD_REQUEST){
+			quitCgiProcess();
+			_httpMessage =HttpMessage(&_server);
+			return (_httpMessage.setResponse(ws_http::STATUS_502_BAD_GATEWAY, NULL, "", ""));
+		}
 		if (readBytes == -1) {
 			logging("\n -------- handleEvent - quit - readBytes: ", readBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
@@ -336,7 +341,7 @@ void  HttpHandler::processPost( HttpConfig const & config, FileInfo const & file
 	if (!fileInfo.checkInfo(FileInfo::IS_DIRECTORY))
 		return (processError(config, ws_http::STATUS_405_METHOD_NOT_ALLOWED));
 	// if (!fileInfo.checkInfo(FileInfo::READABLE) || !fileInfo.checkInfo(FileInfo::WRITEABLE))
-    //     return (processError(config, ws_http::STATUS_403_FORBIDDEN));
+	//     return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 	// if (!fileInfo.checkInfo(FileInfo::READABLE))
 	// 	return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 	if (!fileInfo.checkInfo(FileInfo::WRITEABLE & FileInfo::READABLE))
