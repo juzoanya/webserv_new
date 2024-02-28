@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 21:17:36 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 23:29:43 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,15 +217,13 @@ void    HttpHandler::handleCgi( HttpConfig const & config )
 
 void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 {
-	logging("\n\n------ PROCESS RESPONSE -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
 	std::string const & method = _httpMessage.header.getHeader("@method");
 	std::string const & version = _httpMessage.header.getHeader("@version");
 	std::string const & pathDecoded = _httpMessage.header.getHeader("@pathdecoded");
 	HttpConfig			config = _server.getHttpConfig(pathDecoded, _httpMessage.header.getHeader("host"));
 	FileInfo			fileInfo(config.getFilePath(), true);
 
-	logging("-> filePath: ", config.getFilePath(), EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+	logging("PROCESS RESPONSE\t", method, pathDecoded, version, config.getFilePath());
 
 	if (currentStatus >= ws_http::STATUS_400_BAD_REQUEST) {
 		if (!fileInfo.checkInfo(FileInfo::EXISTS))
@@ -236,7 +234,7 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 	
 	// check version
 	if (version != "HTTP/1.1") {
-		logging("-> Version not supprtet, return 505: version: ", version, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+		logging("--> Version not supprtet, return 505: version: ", version, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		return (processError(config, ws_http::STATUS_505_HTTP_VERSION_NOT_SUPPORTED));
 	}
 	// check redirection
@@ -257,25 +255,19 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 	}
 	// check if dir and indexFile
 	if (fileInfo.checkInfo(FileInfo::IS_DIRECTORY)) {
-		logging("--> is Directory.", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		std::vector<std::string> const & indexFiles = config.getIndexFile();
 		for (std::vector<std::string>::const_iterator it = indexFiles.begin(); it != indexFiles.end(); ++it) {
 			if (!fileInfo.checkContainedFile(*it))
 				continue;
 			if (!_httpMessage.header.reparseRequestLine(method, pathDecoded[pathDecoded.size() - 1] == '/' ? pathDecoded + *it : pathDecoded + "/" + *it))
 				return(_httpMessage.setResponse(ws_http::STATUS_500_INTERNAL_SERVER_ERROR, NULL, "", ""));
-			logging("---> index found: ", *it, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+			logging("is Directory: index found: ", *it, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (processResponse(currentStatus));
 		}
 	}
-
-	// check cgi
-
 	std::string const & cgiExecutablePath = config.getCgiExecutable();
-	std::cout << "********PATH*********" << cgiExecutablePath << std::endl;
 	if (!cgiExecutablePath.empty())
 		return (handleCgi(config));
-
 	if (method == "POST")
 		return (processPost(config, fileInfo));
 	if (method == "DELETE")
@@ -287,7 +279,7 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 
 void  HttpHandler::processError( HttpConfig const & config, ws_http::statuscodes_t errorCode )
 {
-	logging("\n------ processError -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+	logging("PROCESS ERROR\t", ws_http::statuscodes.at(errorCode), EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	std::string const & errorPageUri = config.getErrorPage(errorCode);
 	if (errorPageUri.empty())
 		return (_httpMessage.setResponse(errorCode, NULL, "", ""));

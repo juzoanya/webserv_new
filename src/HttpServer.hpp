@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 13:20:12 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 19:42:14 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 22:20:59 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,19 +26,6 @@ class HttpServer : public APollEventHandler, public IOnHttpMessageBodySize {
         long        operator()( std::string const & host, std::string const & path );
         void        handleEvent( struct pollfd pollfd );
         std::vector<ConfigParser::ServerContext const *> const & getServerConfigs( void ) const;
-        struct ListeningForConnectionException  : public std::exception { const char *what() const throw() { return ("Error Listening for Connections."); } };
-        struct EPollEventException              : public std::exception { const char *what() const throw() { return ("Error creating epoll instance."); } };
-        struct AcceptingConnectionException     : public std::exception { const char *what() const throw() { return ("Error accepting connections."); } };
-        struct CreatingServerSocketException    : public std::exception { const char *what() const throw() { return ("Error creating Server Socket."); } };
-        struct BindSocketServerException        : public std::exception { const char *what() const throw() { return ("Error bindinding socket to this host:port."); } };
-        struct ClientSocketReadException        : public std::exception { const char *what() const throw() { return ("Error reading from client socket."); } };
-        struct ClientSocketWriteException       : public std::exception { const char *what() const throw() { return ("Error writing to client socket."); } };
-        struct AddToEpollSetException           : public std::exception { const char *what() const throw() { return ("Error adding server socket to epoll set."); } };
-        struct DeleteFromEpollSetException      : public std::exception { const char *what() const throw() { return ("Error deleting client socket to epoll set."); } };
-        struct EpollWaitException               : public std::exception { const char *what() const throw() { return ("Epoll wait Error."); } };
-        struct AcceptConnectionException        : public std::exception { const char *what() const throw() { return ("Error accepting connection."); } };
-        struct FailedToCloseFdException         : public std::exception { const char *what() const throw() { return ("Error closing file descriptor."); } };
-        struct SetSocketNonBlockingexception    : public std::exception { const char *what() const throw() { return ("Error setting Socket non-blocking."); } };
 
     private:
         std::vector<ConfigParser::ServerContext const *>   _serverConfigs;

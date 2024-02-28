@@ -47,30 +47,55 @@ WsIpPort	getServerIpPort( ws_config_t const & serverDirectives )
 	return (WsIpPort(it->second[0].substr(0, pos), it->second[0].substr(pos + 1, std::string::npos)));
 }
 
-int	createHttpServersByConfig( Polling& polling, ConfigParser& config )
+
+int    createHttpServersByConfig( Polling& polling, ConfigParser& config )
 {
 	std::vector<HttpServer*> servers;
 	for (int i = 0; i != config.getServerCount(); ++i) {
 		ConfigParser::ServerContext const & currContext = config.serverConfigs[i];
 		try {
-			logging("create server: ", i, ": ", EMPTY_STRING, EMPTY_STRING);
 			WsIpPort ipPort = getServerIpPort(currContext.serverConfig);
 			std::cout << ipPort.getIpStr() << ":" << ipPort.getPortStr() << "]: ";
 			std::vector<HttpServer*>::iterator servIt = std::find_if(servers.begin(), servers.end(), ipPort);
 			if (servIt != servers.end()) {
 				(*servIt)->addServerConfig(currContext);
-				logging("added server config to existing HttpServer", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+				logging("server: ", i, ": ", ipPort, ": added server config to existing HttpServer");
 			} else {
 				servers.push_back(new HttpServer(ipPort, polling));
 				servers.back()->addServerConfig(currContext);
-				logging("create instance of HttpServer", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+				logging("server: ", i, ": ", ipPort, ": create instance of HttpServer");
 			}
 		} catch(const std::exception& e) {
-			std::cout << "error: " << e.what() << '\n';
+			std::cerr << "server: " << i << ": " << "error creating server: " << e.what() << '\n';
 		}
 	}
 	return (servers.size());
 }
+
+// int	createHttpServersByConfig( Polling& polling, ConfigParser& config )
+// {
+// 	std::vector<HttpServer*> servers;
+// 	for (int i = 0; i != config.getServerCount(); ++i) {
+// 		ConfigParser::ServerContext const & currContext = config.serverConfigs[i];
+// 		try {
+// 			logging("create server: ", i, ": ", EMPTY_STRING, EMPTY_STRING);
+// 			WsIpPort ipPort = getServerIpPort(currContext.serverConfig);
+// 			std::cout << ipPort.getIpStr() << ":" << ipPort.getPortStr() << "]: ";
+// 			std::vector<HttpServer*>::iterator servIt = std::find_if(servers.begin(), servers.end(), ipPort);
+// 			if (servIt != servers.end()) {
+// 				(*servIt)->addServerConfig(currContext);
+// 				logging("added server config to existing HttpServer", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+// 			} else {
+// 				servers.push_back(new HttpServer(ipPort, polling));
+// 				servers.back()->addServerConfig(currContext);
+// 				logging("create instance of HttpServer", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+// 			}
+// 		} catch(const std::exception& e) {
+// 			std::cout << "error: " << e.what() << '\n';
+// 		}
+// 	}
+// 	return (servers.size());
+// }
 
 int main(int argc, char* argv[])
 {
@@ -85,8 +110,10 @@ int main(int argc, char* argv[])
 			config.configParser(argv[1]);
 			serversCreated = createHttpServersByConfig(polling, config);
 		}
-		if (serversCreated == 0)
+		if (serversCreated == 0){
 			new HttpServer(WsIpPort("0.0.0.0", "80"), polling);
+			logging("no servers provided: create default server", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+		}
 		signal(SIGCHLD, sigchild_handler);
 		signal(SIGINT, sigint_handler);
 		polling.startPolling();

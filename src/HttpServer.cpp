@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 13:20:20 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 20:40:53 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 22:59:11 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,27 @@ HttpServer::HttpServer( WsIpPort const & ipPort, Polling & polling )
 {
 	int serversocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serversocket == -1)
-		throw HttpServer::CreatingServerSocketException();
+		throw std::runtime_error(std::string("server socket: socket: ") + strerror(errno));
+
 
 	// reuse the ip:port socket
 	int set = 1;
-	if (setsockopt(serversocket, SOL_SOCKET, SO_REUSEADDR, (void *)&set, sizeof(int)) == -1)
-		throw std::runtime_error("setsockopt reuse addr error");
-
-	fcntl(serversocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-	if (bind(serversocket, (struct sockaddr *)&ipPort.getSockaddrIn(), sizeof(struct sockaddr)) == -1)
-		throw HttpServer::BindSocketServerException();
-	if (listen(serversocket, 100) == -1)
-		throw HttpServer::ListeningForConnectionException();
+	if (setsockopt(serversocket, SOL_SOCKET, SO_REUSEADDR, (void *)&set, sizeof(int)) == -1) {
+		close(serversocket);
+		throw std::runtime_error(std::string("server socket: set socket reuse address: ") + strerror(errno));
+	}
+	if (fcntl(serversocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1) {
+		close(serversocket);
+		throw std::runtime_error(std::string("server socket: set socket non blocking: ") + strerror(errno));
+	}
+	if (bind(serversocket, (struct sockaddr *)&ipPort.getSockaddrIn(), sizeof(struct sockaddr)) == -1) {
+		close(serversocket);
+		throw std::runtime_error(std::string("server socket: bind: ")  + strerror(errno));
+	}
+	if (listen(serversocket, 100) == -1) {
+		close(serversocket);
+		throw std::runtime_error(std::string("server socket: listen: ")  + strerror(errno));
+	}
 	_polling.startMonitoringFd(serversocket, POLLIN, this, false);
 }
 
@@ -94,14 +103,13 @@ void HttpServer::handleEvent( struct pollfd pollfd )
 			{
 				if (errno == EWOULDBLOCK)
 					return ;
-				throw HttpServer::AcceptConnectionException();
+				throw std::runtime_error(std::string("client socket: accept: ") + strerror(errno));
 			}
 			if (fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1) {
 				close(clientSocket);
-				throw HttpServer::SetSocketNonBlockingexception();
+				throw std::runtime_error(std::string("client socket: make socket non blocking: ") + strerror(errno));
 			}
 			WsIpPort ipPortData(*reinterpret_cast<struct sockaddr_in*>(&addr));
-			logging("New Client socket ", clientSocket, " created!", ipPortData, EMPTY_STRING);
 			HttpHandler *newHandler = new HttpHandler(ipPortData, _polling, *this);
 			_polling.startMonitoringFd(clientSocket, POLLIN | POLLOUT, newHandler, true);
 		}

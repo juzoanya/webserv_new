@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpMessage.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:20:26 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:54:32 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 22:58:22 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ class HttpMessage {
 		ws_http::statuscodes_t  parseBodyChunk(unsigned char c);
 		ws_http::statuscodes_t  parseBodyChunkSize(unsigned char c);
 
-		buff_t                  _buffer2;
+		buff_t                  _buffer;
 		const char*             _dataPtr;
 		IOnHttpMessageBodySize  *_maxBodySizeGetter;
 		std::size_t             _contentLength;

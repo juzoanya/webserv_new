@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:40:12 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 20:38:16 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 23:09:32 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ std::size_t getStingStreamSize(std::stringstream & ss);
 std::size_t getStreamSize(std::istream & is );
 void        addStreamToBuff( buff_t & buffer, std::istream & is, std::size_t streamSize );
 std::string urlEncodeString(std::string const & value);
-void    printCharOrRep(char c, bool printEndl);
 
 template<typename T>
 std::string toStr(T data)
@@ -46,13 +45,13 @@ void	logging(const T1& first, T2& second, T3& third, T4 fourth, T5& fifth)
 
 	file << getDateString(0, "%H:%M:%S ");
 	if (sizeof(T1) != 0)
-		file << first;
+		file << first << " ";
 	if (sizeof(T2) != 0)
-		file << second;
+		file << second << " ";
 	if (sizeof(T3) != 0)
-		file << third;
+		file << third << " ";
 	if (sizeof(T4) != 0)
-		file << fourth;
+		file << fourth << " ";
 	if (sizeof(T5) != 0)
 		file << fifth << std::endl;
 	file.close();

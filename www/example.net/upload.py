@@ -23,21 +23,10 @@ if fileitem.filename:
 else:
     message = 'No file was uploaded'
 
-# print("status: 404 Not found\r\n", end="")
-# print('Content-Type: text/html\r\n', end="")
-# print('\r\n', end="")
-# print("HELLO WORLDDDDDDDDDD")
-# print('<html><head></head><body>')
-# print('<h1>' "HEY!" '</h1>')
-# print('</body></html>')
+print("status: 404 Not found\r\n", end="")
+print('Content-Type: text/html\r\n', end="")
+print('\r\n', end="")
+print('<html><head></head><body>')
+print('<h1>' + message + '</h1>')
+print('</body></html>')
 
-print ("Content-type:text/html\r\n")
-print ('\r\n')
-print ('<html>')
-print ('<head>')
-print ('<title>Upload</title>')
-print ('</head>')
-print ('<body>')
-print ('<h2>' + message + '</h2>')
-print ('</body>')
-print ('</html>')

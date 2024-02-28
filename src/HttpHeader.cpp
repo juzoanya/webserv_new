@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpHeader.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 12:03:38 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:52:44 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 22:54:39 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,7 +252,6 @@ int  HttpHeader::parseHeader(const char *start, const char *end, bool parseReqli
 
 int HttpHeader::reparseRequestLine( std::string const & method, std::string const & requestTarget )
 {
-	logging("\n------ reparseRequestLine -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	if (!(_state & HEADER_DONE) || _state == -1)
 		return (0);
 	_headers[METHOD].second = method;
@@ -270,12 +269,5 @@ int HttpHeader::reparseRequestLine( std::string const & method, std::string cons
 		else if (_pos == VERSION)
 			break ;
 	}
-	logging("reparsed method: ", _headers[METHOD].second, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	logging("reparsed path: ", _headers[PATH].second, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	logging("reparsed path decoded: ", _headers[PATH_DECODED].second, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	logging("reparsed query: ", _headers[QUERY].second, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	logging("reparsed: ", _headers[QUERY_DECODED].second, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	logging("reparsed fulluri: ", _headers[FULLURI].second, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	logging("raparsing return value: ", ret, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	return (ret == -1 ? -1 : 1);
 }

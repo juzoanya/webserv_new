@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:04:21 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 21:22:43 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 23:03:31 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,27 +26,6 @@ std::string getPollEvent(short events)
 	return (str);
 }
 
-void    printPollArray(std::vector<struct pollfd>& pollfdArr, std::vector<APollEventHandler*>& eventHandler, int currPos)
-{
-	std::cout << " [ ";
-	for (std::size_t i = 0; i != pollfdArr.size(); ++i) {
-		std::cout << std::setw(3) << pollfdArr[i].fd;
-	}
-	std::cout << " ] " << std::endl;
-	std::cout << " [ ";
-	for (std::size_t i = 0; i != pollfdArr.size(); ++i) {
-		std::cout << std::setw(3) << pollfdArr[i].revents;
-	}
-	std::cout << " ] " << std::endl;
-	std::cout << " [ ";
-	for (std::size_t i = 0; i != eventHandler.size(); ++i) {
-		std::cout << std::setw(3) << (eventHandler[i] ? "a" : "n");
-	}
-	std::cout << " ] " << std::endl;
-	if (currPos >= 0)
-		std::cout << std::setw(6 + currPos * 3) << "x" << std::endl;
-}
-
 void    printPollDetail(std::vector<struct pollfd>& pollfdArr, std::vector<APollEventHandler*>& eventHandler, int currPos=-1)
 {
 	std::cout << " ------ whats in my pollFd list? ------ \n";
@@ -64,7 +43,6 @@ void    printPollDetail(std::vector<struct pollfd>& pollfdArr, std::vector<APoll
 		std::cout << std::endl;
 	}
 }
-
 
 APollEventHandler::APollEventHandler( Polling & polling, bool deleteStopMonitoring )
  : index(polling.getAvailableIndex()), deleteOnStopMonitoring(deleteStopMonitoring), _polling(polling)
@@ -109,29 +87,17 @@ unsigned long getCurrTimeMs( void )
 
 void    Polling::startMonitoringFd( int fd, short events, APollEventHandler *handler, bool trackTimeout )
 {
-	// std::cout << "\n---- POLLING: START monitoring at index: " <<  handler->index << std::endl;
-	// logging("---- start monitoring at index: ", handler->index, this->_pollFds[handler->index].fd, " = old fd | new fd = ", fd);
-	// logging(" --- before:", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	// std::cout << "before: " << std::endl;
-	// printPollDetail(_pollFds, _pollEventHandlers, handler->index);
 	_pollFds[handler->index].fd = fd;
 	_pollFds[handler->index].events = events;
 	_pollFds[handler->index].revents = 0;
 	_pollEventHandlers[handler->index] = handler;
 	if (trackTimeout)
 		_pollTimeouts[handler->index] = getCurrTimeMs() + timeout_ms;
-	// logging(" --- after:", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	// printPollDetail(_pollFds, _pollEventHandlers, handler->index);
-	// logging(" --------------------------------------", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 }
-
 
 void    Polling::stopMonitoringFd( APollEventHandler *handler )
 {
-
 	int index = handler->index;
-	// logging("stop monitoring at index: ", index, " | fd: ", this->_pollFds[index].fd, EMPTY_STRING);
-	// printPollDetail(_pollFds, _pollEventHandlers, index);
 	if (handler && this->_pollFds[index].fd != -1) {
 		close(this->_pollFds[index].fd);
 		this->_pollFds[index].fd = -1;
@@ -144,7 +110,6 @@ void    Polling::stopMonitoringFd( APollEventHandler *handler )
 		this->_pollTimeouts[index] = 0;
 		_freeIndices.push(index);
 	}
-	// printPollDetail(_pollFds, _pollEventHandlers);
 }
 
 void    Polling::startPolling( void )
@@ -158,8 +123,7 @@ void    Polling::startPolling( void )
 		if (ret == -1 && errno == EINTR)
 			continue;
 		if (ret == -1) {
-			std::cerr << "poll error: " << strerror(errno) << "\n";
-			throw std::runtime_error("error polling");
+			throw std::runtime_error(std::string("poll: ") + strerror(errno)); ;
 		}
 		unsigned long curr_time = getCurrTimeMs();
 		for (std::size_t i = 0; i != currSize; ++i) {
@@ -167,8 +131,6 @@ void    Polling::startPolling( void )
 				continue ;
 			
 			if (poll_timeout == 200 && _pollTimeouts[i] > 0 && _pollTimeouts[i] < curr_time) {
-				// logging("STOP MONITORING - TIMEOUT", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-				//stopMonitoringFd(_pollEventHandlers[i]);
 				_pollEventHandlers[i]->handleTimeout();
 				_pollTimeouts[i] = getCurrTimeMs() + timeout_ms;
 			}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:03:01 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:20:02 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 22:53:30 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,31 +21,21 @@ HttpConfig::HttpConfig( void )
 HttpConfig::HttpConfig( ws_config_t const * serverDirectives, ws_config_t const * locationDirectives, std::string const & pathDecoded, std::string const & serverName )
  : _serverDirectives(serverDirectives), _locationDirectives(locationDirectives), _serverName(serverName)
 {
-	logging("\n------- HttpConfig constructor -------", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	if (locationDirectives) {
-		logging("------- check locationConfig -------", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		ws_config_t::const_iterator itLoc = locationDirectives->find("location");
 		std::string const &  location = (itLoc->second.size() == 2 && itLoc->second.at(0) == "=") ? itLoc->second.at(1) : itLoc->second.at(0);
-		logging("location in constructor: ", location, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		ws_config_t::const_iterator it = locationDirectives->find("root");
 		if (it != locationDirectives->end() && it->second.size() == 1) {
 			this->_rootPath = it->second.at(0);
 			this->_filePath = it->second.at(0) + pathDecoded.substr(location.size(), std::string::npos);
-			logging("----> found root in locationConfig:", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-			logging("- selected rootPath: ", _rootPath, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-			logging("- selected filePath: ", _filePath, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return ;
 		}
 	}
 	if (serverDirectives) {
-		logging("------- check serverConfig -------", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		ws_config_t::const_iterator it = serverDirectives->find("root");
 		if (it != serverDirectives->end()) {
 			this->_rootPath = it->second.at(0);
 			this->_filePath = it->second.at(0) + pathDecoded;
-			logging("----> found root in serverConfig:", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-			logging("- selected rootPath: ", _rootPath, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-			logging("- selected filePath: ", _filePath, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return ;
 		}
 	}
