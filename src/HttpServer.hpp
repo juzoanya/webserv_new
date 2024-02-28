@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpServer.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 13:20:12 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:45:53 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 19:42:14 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class HttpServer : public APollEventHandler, public IOnHttpMessageBodySize {
         void        addServerConfig( ConfigParser::ServerContext const & serverContext );
         HttpConfig  getHttpConfig( std::string const & pathDecoded, std::string const & hostHeader );
         long        operator()( std::string const & host, std::string const & path );
-        void        handleEvent( struct pollfd & pollfd );
+        void        handleEvent( struct pollfd pollfd );
         std::vector<ConfigParser::ServerContext const *> const & getServerConfigs( void ) const;
         struct ListeningForConnectionException  : public std::exception { const char *what() const throw() { return ("Error Listening for Connections."); } };
         struct EPollEventException              : public std::exception { const char *what() const throw() { return ("Error creating epoll instance."); } };

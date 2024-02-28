@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Polling.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:04:21 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:49:05 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 21:22:43 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,9 @@ void    Polling::startPolling( void )
 			
 			if (poll_timeout == 200 && _pollTimeouts[i] > 0 && _pollTimeouts[i] < curr_time) {
 				// logging("STOP MONITORING - TIMEOUT", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-				stopMonitoringFd(_pollEventHandlers[i]);
+				//stopMonitoringFd(_pollEventHandlers[i]);
+				_pollEventHandlers[i]->handleTimeout();
+				_pollTimeouts[i] = getCurrTimeMs() + timeout_ms;
 			}
 			else if (_pollFds[i].revents != 0)
 				_pollEventHandlers[i]->handleEvent(_pollFds[i]);

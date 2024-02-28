@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 
 	ConfigParser	config;
 	Polling			polling;
-	polling.timeout_ms = 30000;
+	polling.timeout_ms = 10000;
 	try {
 		int serversCreated = 0;
 		if (argc == 2) {

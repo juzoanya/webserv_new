@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Polling.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:00:38 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:49:55 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 20:46:27 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ class APollEventHandler {
 	public:
 		APollEventHandler( Polling & polling, bool deleteStopMonitoring );
 		virtual ~APollEventHandler( void );
-		virtual void handleEvent( struct pollfd & pollfd ) = 0;
+		virtual void handleEvent( struct pollfd pollfd ) = 0;
+		virtual void handleTimeout( void ) {};
 		const int index;
 		const bool deleteOnStopMonitoring;
 	protected:

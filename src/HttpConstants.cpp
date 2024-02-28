@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/03 11:39:38 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/27 21:27:44 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 21:01:51 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,6 +196,7 @@ namespace ws_http {
 			httpStatusCodeMap["502 Bad Gateway"]						= STATUS_502_BAD_GATEWAY;
 			httpStatusCodeMap["501 Not Implemented"]                    = STATUS_501_NOT_IMPLEMENTED;
 			httpStatusCodeMap["503 Service Unavailable"]                = STATUS_503_SERVICE_UNAVAILABLE;
+			httpStatusCodeMap["504 Gateway Timeout"]					= STATUS_504_GATEWAY_TIMEOUT;
 			httpStatusCodeMap["505 HTTP Version Not Supported"]         = STATUS_505_HTTP_VERSION_NOT_SUPPORTED;
 			
 			return (httpStatusCodeMap);

@@ -1,8 +1,8 @@
 .DS_Store
 bin
-conf/webserv_max_port_test.conf
-conf/webserv_max.conf
+conf
 www/example.org
+www/upload
 tester
 build
 archive

@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:39:29 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 22:01:13 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 20:39:26 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,12 @@ WsIpPort::WsIpPort( std::string const & ipStr, std::string const & portStr ) : _
 WsIpPort::~WsIpPort( void )
 { }
 
+std::ostream & operator<<( std::ostream & o, WsIpPort const & src )
+{
+    o << "[" << src.getIpStr() << ":" << src.getPortStr() << "]";
+    return (o);
+}
+
 bool WsIpPort::operator==( WsIpPort const & rhs ) const { return (rhs._ipStr == this->_ipStr && rhs._portStr == this->_portStr); }
 bool WsIpPort::operator()( HttpServer const & rhs ) const { return (rhs.serverIpPort.getIpStr() == this->_ipStr && rhs.serverIpPort.getPortStr() == this->_portStr); }
 bool WsIpPort::operator()( HttpServer const * rhs ) const { return (rhs->serverIpPort.getIpStr() == this->_ipStr && rhs->serverIpPort.getPortStr() == this->_portStr); }
@@ -162,11 +168,6 @@ FileInfo::~FileInfo( void )
 { }
 
 bool 	FileInfo::checkInfo( int fileInfoFlags ) const { 
-	if (_infos & READABLE)
-		std::cout << "INFO STATE ------> READABLE\n";
-	if (_infos & WRITEABLE)
-		std::cout << "INFO STATE ------> READABLE\n";
-	std::cout << "INFO STATE ---------->" << static_cast<int>(_infos) << std::endl;
 	return (_infos & fileInfoFlags); }
 
 bool	FileInfo::checkContainedFile( std::string const & filename )

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpServer.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 13:20:20 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:44:50 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 20:40:53 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ HttpConfig HttpServer::getHttpConfig( std::string const & pathDecoded, std::stri
 	return (HttpConfig(&currConfig->serverConfig, currLoc, pathDecoded, hostname));
 }
 
-void HttpServer::handleEvent( struct pollfd & pollfd )
+void HttpServer::handleEvent( struct pollfd pollfd )
 {
 	if (!(pollfd.revents & POLLIN))
 		return ;
@@ -101,6 +101,7 @@ void HttpServer::handleEvent( struct pollfd & pollfd )
 				throw HttpServer::SetSocketNonBlockingexception();
 			}
 			WsIpPort ipPortData(*reinterpret_cast<struct sockaddr_in*>(&addr));
+			logging("New Client socket ", clientSocket, " created!", ipPortData, EMPTY_STRING);
 			HttpHandler *newHandler = new HttpHandler(ipPortData, _polling, *this);
 			_polling.startMonitoringFd(clientSocket, POLLIN | POLLOUT, newHandler, true);
 		}

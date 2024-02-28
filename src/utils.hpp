@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:40:12 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:33:59 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 20:38:16 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,5 +107,7 @@ class FileInfo {
 		std::string						_filePath;
 		std::vector<DirListingInfos>    _dirListingInfos;
 };
+
+std::ostream & operator<<( std::ostream & o, WsIpPort const & src );
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 11:31:42 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/27 21:37:38 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 22:04:39 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ ws_http::statuscodes_t  HttpMessage::parseBodyChunkSize(unsigned char c)
 	if (c == '\r') {
 		_state |= CR_FOUND;
 	} else if ((_state & CR_FOUND) && c == '\n') {
+		// std::cout << "CURRENT CHUNK LEN = " << _contentLength << std::endl;
 		_state &= ~PARSE_SIZE;
 		if (_contentLength == 0)
 			_state |= BODY_DONE;

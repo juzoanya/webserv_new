@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpHandler.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mberline <mberline@student.42.fr>          +#+  +:+       +#+        */
+/*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:28 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/26 18:58:16 by mberline         ###   ########.fr       */
+/*   Updated: 2024/02/28 21:03:00 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ class HttpHandler : public APollEventHandler {
 	public:
 		HttpHandler( WsIpPort const & ipPort, Polling & polling, HttpServer & server );
 		~HttpHandler( void );
-		void    handleEvent( struct pollfd & pollfd );
+		void    handleEvent( struct pollfd pollfd );
 		void    handleChildEvent( struct pollfd & pollfd );
+		void    handleTimeout( void );
 
 		const WsIpPort  ipPortData;
 

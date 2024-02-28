@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/27 21:57:06 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/28 21:17:36 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,20 @@ void    HttpHandler::quit( void )
 	return (_polling.stopMonitoringFd(this));
 }
 
-void    HttpHandler::handleEvent( struct pollfd & pollfd )
+void    HttpHandler::handleTimeout( void )
+{
+    if(_httpMessage.isCgi()){
+		quitCgiProcess();
+        _httpMessage = HttpMessage(NULL);
+        _httpMessage.setResponse(ws_http::STATUS_504_GATEWAY_TIMEOUT, NULL, "", "");
+    } else if (_httpMessage.getStatus() == ws_http::STATUS_UNDEFINED) {
+        _httpMessage.setResponse(ws_http::STATUS_408_REQUEST_TIMEOUT, NULL, "", "");
+    } else {
+        quit();
+    }
+}
+
+void    HttpHandler::handleEvent( struct pollfd pollfd )
 {
 	if (pollfd.revents & POLLERR)
 		logging("POLLERR CLIENT", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
@@ -186,14 +199,19 @@ void    HttpHandler::handleCgi( HttpConfig const & config )
 		_childProcessHandler->addEnvVariable(cgiHeader + "=" + head[i].second);
 	}
 
-	// if (!_childProcessHandler->createChildProcess(config.getCgiExecutable(), config.getFilePath().substr(0, config.getFilePath().find_last_of('/')))) {
-	if (!_childProcessHandler->createChildProcess(config.getCgiExecutable(), config.getRootPath()))
+	try
 	{
-		quitCgiProcess();
-		return (processError(config, ws_http::STATUS_500_INTERNAL_SERVER_ERROR));
-	} else {
+		// if (!_childProcessHandler->createChildProcess(config.getCgiExecutable(), config.getFilePath().substr(0, config.getFilePath().find_last_of('/')))) {
+		_childProcessHandler->createChildProcess(config.getCgiExecutable(), config.getRootPath());
 		_httpMessage.prepareCgi();
 	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		quitCgiProcess();
+		return (processError(config, ws_http::STATUS_500_INTERNAL_SERVER_ERROR));
+	}
+	
 
 }
 
@@ -340,12 +358,12 @@ void  HttpHandler::processPost( HttpConfig const & config, FileInfo const & file
 
 	if (!fileInfo.checkInfo(FileInfo::IS_DIRECTORY))
 		return (processError(config, ws_http::STATUS_405_METHOD_NOT_ALLOWED));
-	// if (!fileInfo.checkInfo(FileInfo::READABLE) || !fileInfo.checkInfo(FileInfo::WRITEABLE))
-	//     return (processError(config, ws_http::STATUS_403_FORBIDDEN));
+	if (!fileInfo.checkInfo(FileInfo::READABLE) || !fileInfo.checkInfo(FileInfo::WRITEABLE))
+	    return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 	// if (!fileInfo.checkInfo(FileInfo::READABLE))
 	// 	return (processError(config, ws_http::STATUS_403_FORBIDDEN));
-	if (!fileInfo.checkInfo(FileInfo::WRITEABLE & FileInfo::READABLE))
-		return (processError(config, ws_http::STATUS_403_FORBIDDEN));
+	// if (!fileInfo.checkInfo(FileInfo::WRITEABLE & FileInfo::READABLE))
+	// 	return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 
 	std::string contentType = _httpMessage.header.getHeader("content-type");
 	std::size_t sepPos1 = contentType.find("multipart/form-data");
@@ -384,7 +402,7 @@ void  HttpHandler::processDelete( HttpConfig const & config, FileInfo const & fi
 
 	std::string filePath = config.getFilePath().substr(0, config.getFilePath().find_last_of('/') + 1);
 	FileInfo   directoryPath(filePath, false);
-	if (!directoryPath.checkInfo(FileInfo::READABLE | FileInfo::WRITEABLE | FileInfo::EXECUTABLE))
+	if (!directoryPath.checkInfo(FileInfo::READABLE) || !directoryPath.checkInfo(FileInfo::WRITEABLE) || !directoryPath.checkInfo(FileInfo::EXECUTABLE))
 		return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 
 	std::remove(config.getFilePath().c_str());
