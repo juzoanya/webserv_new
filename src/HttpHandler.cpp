@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/27 21:29:54 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/27 21:57:06 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 			return (_httpMessage.setResponse(ws_http::STATUS_502_BAD_GATEWAY, NULL, "", ""));
 		}
 		if (readBytes == -1) {
-			logging("\n -------- handleEvent - quit - readBytes: ", readBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+			logging("HandleEvent - quit - readBytes: ", readBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		} else if (readBytes == 0) {
 
@@ -134,7 +134,7 @@ void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 	if (pollfd.revents & POLLOUT && _httpMessage.responseSet() && _httpMessage.isCgi()) {
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
 		if (sendBytes == -1) {
-			logging("\n -------- handleEvent - quit - sendBytes: ", sendBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+			logging("HandleEvent - quit - sendBytes: ", sendBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		} else if (sendBytes == 0) {
 
@@ -244,7 +244,7 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 		for (std::vector<std::string>::const_iterator it = indexFiles.begin(); it != indexFiles.end(); ++it) {
 			if (!fileInfo.checkContainedFile(*it))
 				continue;
-			if (!_httpMessage.header.reparseRequestLine(method, pathDecoded + "/" + *it))
+			if (!_httpMessage.header.reparseRequestLine(method, pathDecoded[pathDecoded.size() - 1] == '/' ? pathDecoded + *it : pathDecoded + "/" + *it))
 				return(_httpMessage.setResponse(ws_http::STATUS_500_INTERNAL_SERVER_ERROR, NULL, "", ""));
 			logging("---> index found: ", *it, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (processResponse(currentStatus));
