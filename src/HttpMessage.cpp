@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 11:31:42 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 23:34:14 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:27:27 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,8 +196,7 @@ void    HttpMessage::setCgiResponseDone( void )
 		_state |= IS_RESPONSE_FROM_CGI;
 	_dataPtr = _buffer.data() + _maxBodySize;
 	_contentLength = _buffer.size() - _maxBodySize;
-	logging("--------> SET CGI RESPONSE: ", status, " | bytes to send: ", _maxBodySize, "\n\n");
-
+	Polling::logFile << " -> " <<  (status.empty() ? ws_http::statuscodes.at(ws_http::STATUS_200_OK) : status) << ", " << _maxBodySize << " bytes" << std::endl;
 }
 
 void    HttpMessage::setResponse( ws_http::statuscodes_t status, std::istream *data, std::string const & mimeType, std::string const & location )
@@ -238,8 +237,7 @@ void    HttpMessage::setResponse( ws_http::statuscodes_t status, std::istream *d
 	_state |= RESPONSE_SET;
 	_dataPtr = _buffer.data();
 	_contentLength = _buffer.size();
-	logging("--------> SET RESPONSE: ", ws_http::statuscodes.at(status), " | bytes to send: ", _contentLength, "\n\n");
-
+	Polling::logFile << " -> " <<  ws_http::statuscodes.at(status) << ", " << _contentLength << " bytes" << std::endl;
 }
 
 int     HttpMessage::readFromSocketAndParseHttp( int socketfd, int flags )

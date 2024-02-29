@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 14:01:57 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 22:49:58 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:22:09 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,7 @@ void    ChildProcessHandler::createChildProcess( std::string const & binPath, st
 	FileInfo   cgiExecutable(binPath, false);
 	if (!cgiExecutable.checkInfo(FileInfo::EXECUTABLE))
 		throw std::logic_error(std::string("cgi: cgi binary not executable"));
-	logging("CREATE CHILD PROCESS", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
+	
 	std::vector<char*> envp;
 	for (std::size_t i = 0; i != this->_cgiEnv.size(); ++i)
 		envp.push_back(const_cast<char*>(this->_cgiEnv[i].c_str()));
@@ -89,6 +88,7 @@ void    ChildProcessHandler::createChildProcess( std::string const & binPath, st
 		}
 		_polling.startMonitoringFd(sock_pair[ChildProcessHandler::parentsock], POLLIN | POLLOUT, this, false);
 	}
+	Polling::logFile << " -> childprocess created " << std::endl;
 }
 
 void    ChildProcessHandler::terminateChildProcess( void )

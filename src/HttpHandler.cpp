@@ -6,46 +6,11 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/29 18:59:48 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:41:34 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.hpp"
-
-// std::string getPollEventStr(short events)
-// {
-// 	std::string str = "";
-// 	if (events & POLLIN)
-// 		str += "POLLIN ";
-// 	if (events & POLLPRI)
-// 		str += "POLLPRI ";
-// 	if (events & POLLOUT)
-// 		str += "POLLOUT ";
-// 	if (events & POLLRDNORM)
-// 		str += "POLLRDNORM ";
-// 	if (events & POLLWRNORM)
-// 		str += "POLLWRNORM ";
-// 	if (events & POLLRDBAND)
-// 		str += "POLLRDBAND ";
-// 	if (events & POLLWRBAND)
-// 		str += "POLLWRBAND ";
-// 	if (events & POLLEXTEND)
-// 		str += "POLLEXTEND ";
-// 	if (events & POLLATTRIB)
-// 		str += "POLLATTRIB ";
-// 	if (events & POLLNLINK)
-// 		str += "POLLNLINK ";
-// 	if (events & POLLWRITE)
-// 		str += "POLLWRITE ";
-// 	if (events & POLLERR)
-// 		str += "POLLERR ";
-// 	if (events & POLLHUP)
-// 		str += "POLLHUP ";
-// 	if (events & POLLNVAL)
-// 		str += "POLLNVAL ";
-
-// 	return (str);
-// }
 
 HttpHandler::HttpHandler( WsIpPort const & ipPort, Polling & polling, HttpServer & server )
  : APollEventHandler(polling, true), ipPortData(ipPort), _childProcessHandler(NULL), _server(server), _httpMessage(&server)
@@ -59,8 +24,7 @@ HttpHandler::~HttpHandler( void )
 void    HttpHandler::quitCgiProcess( void )
 {
 	if (_childProcessHandler) {
-		// logging("\n -------- quitCgiProcess -------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-		Polling::logFile << "-------- quitCgiProcess --------\n";
+		Polling::logFile << ipPortData << " -> quitCgiProcess " << std::endl;
 		_polling.stopMonitoringFd(_childProcessHandler);
 		_childProcessHandler = NULL;
 	}
@@ -69,8 +33,7 @@ void    HttpHandler::quitCgiProcess( void )
 void    HttpHandler::quit( void )
 {
 	quitCgiProcess();
-	Polling::logFile << "-------- quitClientConnection --------\n";
-	// logging("\n -------- quitClientConnection -------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+	Polling::logFile << ipPortData << " -> quitClientConnection " << std::endl;
 	return (_polling.stopMonitoringFd(this));
 }
 
@@ -80,8 +43,6 @@ void    HttpHandler::handleTimeout( void )
 		quitCgiProcess();
         _httpMessage = HttpMessage(NULL);
         _httpMessage.setResponse(ws_http::STATUS_504_GATEWAY_TIMEOUT, NULL, "", "");
-    } else if (_httpMessage.getStatus() == ws_http::STATUS_UNDEFINED) {
-        _httpMessage.setResponse(ws_http::STATUS_408_REQUEST_TIMEOUT, NULL, "", "");
     } else {
         quit();
     }
@@ -89,21 +50,17 @@ void    HttpHandler::handleTimeout( void )
 
 void    HttpHandler::handleEvent( struct pollfd pollfd )
 {
-	if (pollfd.revents & POLLERR)
-		logging("POLLERR CLIENT", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
 	if (pollfd.revents & POLLHUP) {
-		logging("\n -------- handleEvent - quit - POLLHUP ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+		Polling::logFile << " POLLHUP ";
 		return (quit());
 	}
 	if (pollfd.revents & POLLIN && !_httpMessage.responseSet() && !_httpMessage.isCgi()) {
 		int readBytes = _httpMessage.readFromSocketAndParseHttp(pollfd.fd, 0);
 		if (readBytes == -1 || readBytes == 0) {
-			logging("\n -------- handleEvent - quit - readBytes: ", readBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		}
 		if (_httpMessage.getStatus() == ws_http::STATUS_200_OK) {
-			_httpMessage.printMessage(0);
+			//_httpMessage.printMessage(0);
 			processResponse(_httpMessage.getStatus());
 		} else if (_httpMessage.getStatus() != ws_http::STATUS_UNDEFINED) {
 			_httpMessage.setResponse(_httpMessage.getStatus(), NULL, "", "");
@@ -112,10 +69,8 @@ void    HttpHandler::handleEvent( struct pollfd pollfd )
 	if (pollfd.revents & POLLOUT && _httpMessage.responseSet() && !_httpMessage.isCgi()) {
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
 		if (sendBytes == -1) {
-			logging("\n -------- handleEvent - quit - sendBytes: ", sendBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		} else if (sendBytes == 0) {
-			logging("\n ------- RESPONSE SENT, RESET HTTP MESSAGE ------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			_httpMessage = HttpMessage(&_server);
 		}
 	}
@@ -123,10 +78,8 @@ void    HttpHandler::handleEvent( struct pollfd pollfd )
 
 void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 {
-	if (pollfd.revents & POLLERR)
-		logging("POLLERR CHILD", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
 	if (pollfd.revents & POLLHUP) {
+		Polling::logFile << " POLLHUP CHILD PROCESS ";
 		_httpMessage.setCgiResponseDone();
 		return (quitCgiProcess());
 	}
@@ -138,7 +91,6 @@ void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 			return (_httpMessage.setResponse(ws_http::STATUS_502_BAD_GATEWAY, NULL, "", ""));
 		}
 		if (readBytes == -1) {
-			logging("HandleEvent - quit - readBytes: ", readBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		} else if (readBytes == 0) {
 
@@ -149,7 +101,6 @@ void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 	if (pollfd.revents & POLLOUT && _httpMessage.responseSet() && _httpMessage.isCgi()) {
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
 		if (sendBytes == -1) {
-			logging("HandleEvent - quit - sendBytes: ", sendBytes, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 			return (quit());
 		} else if (sendBytes == 0) {
 
@@ -168,7 +119,7 @@ int charToupperUnderscore( int c )
 
 void    HttpHandler::handleCgi( HttpConfig const & config )
 {
-	logging("\n------ handleCgi -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+	Polling::logFile << " -> handle CGI ";
 	_childProcessHandler = new ChildProcessHandler(_polling, *this);
 
 	_childProcessHandler->addArgument(config.getFilePath());
@@ -203,7 +154,6 @@ void    HttpHandler::handleCgi( HttpConfig const & config )
 
 	try
 	{
-		// if (!_childProcessHandler->createChildProcess(config.getCgiExecutable(), config.getFilePath().substr(0, config.getFilePath().find_last_of('/')))) {
 		_childProcessHandler->createChildProcess(config.getCgiExecutable(), config.getRootPath());
 		_httpMessage.prepareCgi();
 	}
@@ -225,7 +175,7 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 	HttpConfig			config = _server.getHttpConfig(pathDecoded, _httpMessage.header.getHeader("host"));
 	FileInfo			fileInfo(config.getFilePath(), true);
 
-	logging("PROCESS RESPONSE\t", method, pathDecoded, version, config.getFilePath());
+	Polling::logFile << ipPortData << getDateString(0, " - %y-%m-%d %H:%M:%S - ") << method << " " << pathDecoded << " " << version;
 
 	if (currentStatus >= ws_http::STATUS_400_BAD_REQUEST) {
 		if (!fileInfo.checkInfo(FileInfo::EXISTS))
@@ -236,23 +186,19 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 	
 	// check version
 	if (version != "HTTP/1.1") {
-		logging("--> Version not supprtet, return 505: version: ", version, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		return (processError(config, ws_http::STATUS_505_HTTP_VERSION_NOT_SUPPORTED));
 	}
 	// check redirection
 	Redirect redirect = config.getRedirection();
 	if (redirect.redirectStatus != ws_http::STATUS_UNDEFINED) {
-		logging("-> Return Redirect of: ", ws_http::statuscodes.at(redirect.redirectStatus), EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		return (_httpMessage.setResponse(redirect.redirectStatus, NULL, "", redirect.location));
 	}
 	// if (!fileInfo.readStat(config.getFilePath(), true))
 	if (!fileInfo.checkInfo(FileInfo::EXISTS)) {
-		logging("-> Ressource does not exist: ", pathDecoded, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		return (processError(config, ws_http::STATUS_404_NOT_FOUND));
 	}
 	// check method allowed
 	if (!config.checkAllowedMethod(method)) {
-		logging("-> Method not supportet, return 405: version: ", method, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		return (processError(config, ws_http::STATUS_405_METHOD_NOT_ALLOWED));
 	}
 	// check if dir and indexFile
@@ -263,7 +209,7 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 				continue;
 			if (!_httpMessage.header.reparseRequestLine(method, pathDecoded[pathDecoded.size() - 1] == '/' ? pathDecoded + *it : pathDecoded + "/" + *it))
 				return(_httpMessage.setResponse(ws_http::STATUS_500_INTERNAL_SERVER_ERROR, NULL, "", ""));
-			logging("is Directory: index found: ", *it, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+			Polling::logFile << " -> is Directory: index found: " << *it << " -> reparse" << std::endl;
 			return (processResponse(currentStatus));
 		}
 	}
@@ -281,26 +227,25 @@ void  HttpHandler::processResponse( ws_http::statuscodes_t currentStatus )
 
 void  HttpHandler::processError( HttpConfig const & config, ws_http::statuscodes_t errorCode )
 {
-	logging("PROCESS ERROR\t", ws_http::statuscodes.at(errorCode), EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+	Polling::logFile << " -> Error: " << ws_http::statuscodes.at(errorCode) << std::flush;
 	std::string const & errorPageUri = config.getErrorPage(errorCode);
 	if (errorPageUri.empty())
 		return (_httpMessage.setResponse(errorCode, NULL, "", ""));
 	if (!_httpMessage.header.reparseRequestLine("GET", errorPageUri))
 		return(_httpMessage.setResponse(ws_http::STATUS_500_INTERNAL_SERVER_ERROR, NULL, "", ""));
+	Polling::logFile << " -> reparse" << std::endl;
 	processResponse(errorCode);
 }
 
 
 void  HttpHandler::processGetHead( HttpConfig const & config, FileInfo const & fileInfo, ws_http::statuscodes_t statusCode )
 {
-	logging("\n------ processGetHead -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	
 	if (!fileInfo.checkInfo(FileInfo::READABLE))
 		return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 
 	// check if file
 	if (fileInfo.checkInfo(FileInfo::IS_FILE)) {
-		logging("--> is File. Return File Content", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+		Polling::logFile << " -> is File. ";
 		std::ifstream   ifs(config.getFilePath().c_str(), std::ios::binary);
 		if (!ifs.is_open())
 			return (processError(config, ws_http::STATUS_403_FORBIDDEN));
@@ -308,11 +253,10 @@ void  HttpHandler::processGetHead( HttpConfig const & config, FileInfo const & f
 		return (ifs.close());
 	}
 	// if dir
+	Polling::logFile << " -> is Directory. ";
 	if (!config.hasDirectoryListing()) {
-		logging("---> No Dirlisting: Return 403", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 		return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 	}
-	logging("---> Set Dirlisting", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	std::stringstream ss;
 	fileInfo.setDirListing(ss, _httpMessage.header.getHeader("@pathdecoded"));
 	return (_httpMessage.setResponse(statusCode, &ss, "text/html", ""));
@@ -320,7 +264,6 @@ void  HttpHandler::processGetHead( HttpConfig const & config, FileInfo const & f
 
 bool    createFile(std::string const & filePath, const char *start, const char *end)
 {
-	// logging("UPLOAD HERE: ", filePath, " | size: ", end - start, EMPTY_STRING);
 	std::ofstream ofs(filePath.c_str(), std::ofstream::binary);
 	if (!ofs.is_open()) {
 		return (false);
@@ -334,11 +277,8 @@ int handleMultipart(std::string const & rootPath, std::string & filename, const 
 {
 	HttpHeader fileHeader;
 	int dist = fileHeader.parseHeader(start, end, false);
-	// logging(fileHeader.getHeader("content-disposition"), EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-	// logging(fileHeader.getHeader("content-type"), EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	std::string const & contentDisposition = fileHeader.getHeader("content-disposition");
 	std::size_t fnamepos = contentDisposition.find("filename="); //error?
-	// logging("filename: ", filename, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	filename = contentDisposition.substr(fnamepos + 10, (contentDisposition.size()) - (fnamepos + 11));
 	std::string filePath = rootPath + "/" + filename;
 	return (createFile(filePath, start + dist, end));
@@ -347,17 +287,12 @@ int handleMultipart(std::string const & rootPath, std::string & filename, const 
 
 void  HttpHandler::processPost( HttpConfig const & config, FileInfo const & fileInfo )
 {
-	logging("\n------ processPost -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	std::string const & body = _httpMessage.getBody();
 
 	if (!fileInfo.checkInfo(FileInfo::IS_DIRECTORY))
 		return (processError(config, ws_http::STATUS_405_METHOD_NOT_ALLOWED));
 	if (!fileInfo.checkInfo(FileInfo::READABLE) || !fileInfo.checkInfo(FileInfo::WRITEABLE))
 	    return (processError(config, ws_http::STATUS_403_FORBIDDEN));
-	// if (!fileInfo.checkInfo(FileInfo::READABLE))
-	// 	return (processError(config, ws_http::STATUS_403_FORBIDDEN));
-	// if (!fileInfo.checkInfo(FileInfo::WRITEABLE & FileInfo::READABLE))
-	// 	return (processError(config, ws_http::STATUS_403_FORBIDDEN));
 
 	std::string contentType = _httpMessage.header.getHeader("content-type");
 	std::size_t sepPos1 = contentType.find("multipart/form-data");
@@ -378,19 +313,15 @@ void  HttpHandler::processPost( HttpConfig const & config, FileInfo const & file
 			fileNbr++;
 		}
 	}
-	// FileInfos uploadedDir(config.getFilePath(), R_OK | W_OK, true);
 	FileInfo uploadedDir(config.getFilePath(), true);
 	std::stringstream ss;
 	uploadedDir.setDirListing(ss, _httpMessage.header.getHeader("@pathdecoded"));
-	_httpMessage.printMessage(0);
-	std::cout << "path: " << _httpMessage.header.getHeader("@path") << std::endl;
+	//_httpMessage.printMessage(0);
 	return (_httpMessage.setResponse(ws_http::STATUS_201_CREATED, &ss, "text/html", _httpMessage.header.getHeader("@path")));
 }
 
 void  HttpHandler::processDelete( HttpConfig const & config, FileInfo const & fileInfo )
 {
-	logging("\n------ processDelete -------\n", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
 	if (!fileInfo.checkInfo(FileInfo::IS_FILE))
 		return (processError(config, ws_http::STATUS_405_METHOD_NOT_ALLOWED));
 
@@ -401,5 +332,4 @@ void  HttpHandler::processDelete( HttpConfig const & config, FileInfo const & fi
 
 	std::remove(config.getFilePath().c_str());
 	_httpMessage.setResponse(ws_http::STATUS_204_NO_CONTENT, NULL, "", "");
-
 }
