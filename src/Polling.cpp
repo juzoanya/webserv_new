@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:04:21 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 23:03:31 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/29 18:42:57 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,17 @@ APollEventHandler::APollEventHandler( Polling & polling, bool deleteStopMonitori
 APollEventHandler::~APollEventHandler( void )
 { }
 
+std::ofstream Polling::logFile;
 
 Polling::Polling( void ) : timeout_ms(0)
-{ }
+{
+	Polling::logFile.open("logfile.txt");
+}
 
 Polling::~Polling( void )
-{ }
+{
+	Polling::logFile.close();
+}
 
 int Polling::getAvailableIndex( void )
 {

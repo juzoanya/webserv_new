@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 08:00:38 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 20:46:27 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/29 18:39:37 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class Polling {
 
 		unsigned int timeout_ms;
 		volatile static std::sig_atomic_t	pollterminator;
+		static std::ofstream logFile;
 
 	private:
 		std::vector<struct pollfd>      _pollFds;

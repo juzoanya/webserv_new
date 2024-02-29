@@ -6,7 +6,7 @@
 /*   By: juzoanya <juzoanya@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 09:24:36 by mberline          #+#    #+#             */
-/*   Updated: 2024/02/28 23:29:43 by juzoanya         ###   ########.fr       */
+/*   Updated: 2024/02/29 18:59:48 by juzoanya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ HttpHandler::~HttpHandler( void )
 void    HttpHandler::quitCgiProcess( void )
 {
 	if (_childProcessHandler) {
-		logging("\n -------- quitCgiProcess -------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+		// logging("\n -------- quitCgiProcess -------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+		Polling::logFile << "-------- quitCgiProcess --------\n";
 		_polling.stopMonitoringFd(_childProcessHandler);
 		_childProcessHandler = NULL;
 	}
@@ -68,7 +69,8 @@ void    HttpHandler::quitCgiProcess( void )
 void    HttpHandler::quit( void )
 {
 	quitCgiProcess();
-	logging("\n -------- quitClientConnection -------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+	Polling::logFile << "-------- quitClientConnection --------\n";
+	// logging("\n -------- quitClientConnection -------- ", EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 	return (_polling.stopMonitoringFd(this));
 }
 
