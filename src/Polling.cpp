@@ -144,7 +144,6 @@ void    Polling::startPolling( void )
 		}
 	}
 	for (std::size_t i = 0; i != _pollFds.size(); ++i) {
-		if (_pollEventHandlers[i] && _pollEventHandlers[i]->deleteOnStopMonitoring)
-			delete _pollEventHandlers[i];
+		delete _pollEventHandlers[i];
 	}
 }

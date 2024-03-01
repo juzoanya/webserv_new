@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define sleep duration
-SLEEP_DURATION=5
+SLEEP_DURATION=0
 
 # Server address, endpoint paths, and file paths
 SERVER_ADDRESS="http://localhost:8080"
@@ -19,11 +19,11 @@ reset='\033[0m'
 
 # Function to extract availability percentage from Siege output
 get_availability_percentage() {
-    echo "$1" | sed -n 's/Availability:[[:space:]]*\([0-9.]*\)[[:space:]]*/\1/p'
+    local siege_output="$1"
+    local availability=$(echo "$siege_output" | grep "availability" | awk '{print $2}')
+    v2=${availability::-1}
+    echo "$v2"
 }
-# get_availability_percentage() {
-#     echo "$1" | sed -n 's/Availability:[[:space:]]*\([0-9.]*\) %.*/\1/p'
-# }
 
 # Decorative elements
 decorate_message() {
