@@ -4,12 +4,12 @@
 SLEEP_DURATION=5
 
 # Server address, endpoint paths, and file paths
-SERVER_ADDRESS="http://example.net:8080"
+SERVER_ADDRESS="http://localhost:8080"
 UPLOAD_ENDPOINT="/uploads"
 UNKNOWN_ENDPOINT="/unknown_endpoint"
-UNKNOWN_METHOD_FILE="/fileUpload.html"
-FILE_PATH="/Users/constantin/Desktop"
-FILE_NAME="Caltech_AI_Updated_121223.pdf"
+UNKNOWN_METHOD_FILE="/example.net/fileUpload.html"
+FILE_PATH="/home/juzoanya/Downloads"
+FILE_NAME="tree-736885_1280.jpg"
 
 # ANSI color codes
 yellow='\033[1;33m'
@@ -19,8 +19,11 @@ reset='\033[0m'
 
 # Function to extract availability percentage from Siege output
 get_availability_percentage() {
-    echo "$1" | sed -n 's/Availability:[[:space:]]*\([0-9.]*\) %.*/\1/p'
+    echo "$1" | sed -n 's/Availability:[[:space:]]*\([0-9.]*\)[[:space:]]*/\1/p'
 }
+# get_availability_percentage() {
+#     echo "$1" | sed -n 's/Availability:[[:space:]]*\([0-9.]*\) %.*/\1/p'
+# }
 
 # Decorative elements
 decorate_message() {
@@ -44,7 +47,7 @@ execute_request() {
 
 # GET METHOD
 decorate_message "Testing GET Method..."
-if curl -sSf "${SERVER_ADDRESS}/fileUpload.html"; then
+if curl -sSf "${SERVER_ADDRESS}/example.net/fileUpload.html"; then
     decorate_message "${green}GET Method Test Successful${reset}"
 else
     decorate_message "${red}GET Method Test Failed${reset}"
@@ -109,7 +112,7 @@ sleep $SLEEP_DURATION
 
 # SIEGE BENCHMARK (SILENT MODE)
 decorate_message "Running Siege Benchmark (silent mode)..."
-siege_output=$(siege -b -c 100 -t 1M "${SERVER_ADDRESS}/fileUpload.html" 2>&1)
+siege_output=$(siege -b -c 100 -t 5S "${SERVER_ADDRESS}/empty" 2>&1)
 
 # Check if siege command executed successfully
 if [ $? -eq 0 ]; then

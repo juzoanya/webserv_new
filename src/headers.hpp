@@ -22,7 +22,7 @@
 #include <algorithm>
 
 #define EMPTY_STRING ""
-#define DEFAULT_ROOT_PATH "/Users/maximilian/coding/c/projects/42coding/62_webserv/62_03_webserv_group_small/webserv/www"
+#define DEFAULT_ROOT_PATH "/home/juzoanya/webserv_new/www"
 typedef std::string   buff_t;
 typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 

@@ -3,30 +3,63 @@
 
 #include "headers.hpp"
 
-void	sigchild_handler(int sig)
+// void	sigchild_handler(int sig)
+// {
+// 	if (sig != SIGCHLD)
+// 		return ;
+// 	int status;
+// 	// write(1, "SIGCHILD CAUGHT\n", 17);
+// 	int ret = waitpid(-1, &status, WNOHANG);
+// 	if (ret == 0) {
+// 		write(1, "no childprocesses to terminate\n", 32);
+// 	} else if (ret == -1) {
+// 		// write(1, "error waitpid: ", 16);
+// 		write(1, strerror(errno), 20);
+// 		// write(1, "\n", 1);
+// 	// } else {
+// 	// 	write(1, "CHILD TERMINATED\n", 18);
+// 	}
+// 	if (WIFEXITED(status)) {
+// 		if (WEXITSTATUS(status) == -1)
+// 			write(1, strerror(errno), 20);
+// 	} else if (WIFSIGNALED(status)) {
+// 		write(1, strerror(errno), 20);
+// 	} else if (WIFSTOPPED(status)) {
+// 		write(1, strerror(errno), 20);
+// 	}
+// }
+
+void    sigchild_handler(int sig)
 {
-	if (sig != SIGCHLD)
-		return ;
-	int status;
-	// write(1, "SIGCHILD CAUGHT\n", 17);
-	int ret = waitpid(-1, &status, WNOHANG);
-	if (ret == 0) {
-		write(1, "no childprocesses to terminate\n", 32);
-	} else if (ret == -1) {
-		// write(1, "error waitpid: ", 16);
-		write(1, strerror(errno), 20);
-		// write(1, "\n", 1);
-	// } else {
-	// 	write(1, "CHILD TERMINATED\n", 18);
-	}
-	if (WIFEXITED(status)) {
-		if (WEXITSTATUS(status) == -1)
-			write(1, strerror(errno), 20);
-	} else if (WIFSIGNALED(status)) {
-		write(1, strerror(errno), 20);
-	} else if (WIFSTOPPED(status)) {
-		write(1, strerror(errno), 20);
-	}
+    if (sig != SIGCHLD)
+        return ;
+    int status;
+
+    while (true) {
+        int childpid = waitpid(-1, &status, WNOHANG);
+        if (childpid == -1) {
+            if (errno != ECHILD) {
+                const char* errnoname = strerror(errno);
+                while (errnoname)
+                    write(STDERR_FILENO, errnoname++, 1);
+                write(STDERR_FILENO, "\n", 1);
+            }
+            break ;
+        }
+        if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
+            write(STDERR_FILENO, "cgi child process: exited with non zero value", 45);
+        } else if (WIFSIGNALED(status)) {
+            write(STDERR_FILENO, "cgi child process: terminated by signal: ", 41);
+            const char *signame = strsignal(WTERMSIG(status));
+            while (*signame)
+                write(STDERR_FILENO, signame++, 1);
+            if (WCOREDUMP(status))
+                write(STDERR_FILENO, " - CORE DUMP", 12);
+            write(STDERR_FILENO, "\n", 1);
+        } else if (WIFSTOPPED(status)) {
+            write(STDERR_FILENO, "cgi child process: stopped", 26);
+        }
+    }
 }
 
 void	sigint_handler(int sig)
@@ -56,7 +89,6 @@ int    createHttpServersByConfig( Polling& polling, ConfigParser& config )
 		ConfigParser::ServerContext const & currContext = config.serverConfigs[i];
 		try {
 			WsIpPort ipPort = getServerIpPort(currContext.serverConfig);
-			std::cout << ipPort.getIpStr() << ":" << ipPort.getPortStr() << "]: ";
 			std::vector<HttpServer*>::iterator servIt = std::find_if(servers.begin(), servers.end(), ipPort);
 			if (servIt != servers.end()) {
 				(*servIt)->addServerConfig(currContext);

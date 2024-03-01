@@ -56,11 +56,11 @@ void    HttpHandler::handleEvent( struct pollfd pollfd )
 	}
 	if (pollfd.revents & POLLIN && !_httpMessage.responseSet() && !_httpMessage.isCgi()) {
 		int readBytes = _httpMessage.readFromSocketAndParseHttp(pollfd.fd, 0);
-		if (readBytes == -1 || readBytes == 0) {
+		if (readBytes == -1 || readBytes == 0)
 			return (quit());
-		}
 		if (_httpMessage.getStatus() == ws_http::STATUS_200_OK) {
-			//_httpMessage.printMessage(0);
+			if (_httpMessage.header.getHeader("connection") == "close")
+				_closeConnect = true;
 			processResponse(_httpMessage.getStatus());
 		} else if (_httpMessage.getStatus() != ws_http::STATUS_UNDEFINED) {
 			_httpMessage.setResponse(_httpMessage.getStatus(), NULL, "", "");
@@ -68,11 +68,10 @@ void    HttpHandler::handleEvent( struct pollfd pollfd )
 	}
 	if (pollfd.revents & POLLOUT && _httpMessage.responseSet() && !_httpMessage.isCgi()) {
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
-		if (sendBytes == -1) {
+		if (sendBytes == -1 || sendBytes == 0)
 			return (quit());
-		} else if (sendBytes == 0) {
-			_httpMessage = HttpMessage(&_server);
-		}
+		if (!_httpMessage.responseSet() && _closeConnect)
+			return (quit());
 	}
 }
 

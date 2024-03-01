@@ -3,40 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebServ</title>
-    <!-- Add your CSS styles or external stylesheets here -->
-    <link rel="stylesheet" href="styles.css">
+    <title>Webserv Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 30px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+        li {
+            background-color: #fefdfd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-
-    <header>
-        <h1>Welcome to WebServ Project Page</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <section>
-            <h2>About Us</h2>
-            <p>This is a brief description of our website.</p>
-        </section>
-
-        <section>
-            <h2>Contact Us</h2>
-            <p>You can reach us at <a href="mailto:info@example.com">info@example.com</a>.</p>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 My Website. All rights reserved.</p>
-    </footer>
-
-    <!-- Add your JavaScript scripts or external scripts here -->
-    <script src="script.js"></script>
+    <h1>Welcome to Our webserv Project</h1>
+    <ul>
+        <li><a href="http://127.0.0.1:8080/example.com/index.html">Static Page Test</a></li>
+        <li><a href="http://localhost:8080/webserv.com/index.php">PHP CGI Test</a></li>
+        <li><a href="http://localhost:8080/example.net/gallery.html">Python CGI Test</a></li>
+        <li><a href="http://localhost:8080/example.net/fileUpload.html">HTTP Upload Test</a></li>
+        <li><a href="http://localhost:8080/example.net/loop.php">PHP Forever Loop Test</a></li>
+        <!-- Add more links as needed -->
+    </ul>
 </body>
 </html>

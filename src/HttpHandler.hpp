@@ -38,6 +38,7 @@ class HttpHandler : public APollEventHandler {
 		ChildProcessHandler*    _childProcessHandler;
 		HttpServer&             _server;
 		HttpMessage             _httpMessage;
+		bool					_closeConnect;
 };
 
 #endif
