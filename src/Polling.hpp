@@ -37,11 +37,11 @@ class Polling {
 		~Polling( void );
 
 		int     getAvailableIndex( void );
-		void    startMonitoringFd( int fd, short events, APollEventHandler *handler, bool trackTimeout );
+		void    startMonitoringFd( int fd, short events, APollEventHandler *handler, size_t timeoutMs );
 		void    stopMonitoringFd( APollEventHandler *handler );
 		void    startPolling( void );
+		void	setTimeout(APollEventHandler *handler, size_t timeoutMs);
 
-		unsigned int timeout_ms;
 		volatile static std::sig_atomic_t	pollterminator;
 		static std::ofstream logFile;
 

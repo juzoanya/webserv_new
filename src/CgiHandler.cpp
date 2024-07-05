@@ -86,7 +86,7 @@ void    ChildProcessHandler::createChildProcess( std::string const & binPath, st
 			close(sock_pair[ChildProcessHandler::parentsock]);
 			throw std::runtime_error(std::string("cgi: make unix socket non blocking: ") + strerror(errno));
 		}
-		_polling.startMonitoringFd(sock_pair[ChildProcessHandler::parentsock], POLLIN | POLLOUT, this, false);
+		_polling.startMonitoringFd(sock_pair[ChildProcessHandler::parentsock], POLLIN | POLLOUT, this, 0);
 	}
 	Polling::logFile << " -> childprocess created " << std::endl;
 }

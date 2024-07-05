@@ -37,6 +37,8 @@ void    sigchild_handler(int sig)
 
     while (true) {
         int childpid = waitpid(-1, &status, WNOHANG);
+		if (childpid == 0)
+			break;
         if (childpid == -1) {
             if (errno != ECHILD) {
                 const char* errnoname = strerror(errno);
@@ -111,7 +113,7 @@ int main(int argc, char* argv[])
 
 	ConfigParser	config;
 	Polling			polling;
-	polling.timeout_ms = 30000;
+	// polling.timeout_ms = 30000;
 	// polling.timeout_ms = 10000;
 	try {
 		int serversCreated = 0;

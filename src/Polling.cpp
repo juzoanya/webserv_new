@@ -53,7 +53,7 @@ APollEventHandler::~APollEventHandler( void )
 
 std::ofstream Polling::logFile;
 
-Polling::Polling( void ) : timeout_ms(0)
+Polling::Polling( void )
 {
 	Polling::logFile.open("logfile.txt");
 }
@@ -90,14 +90,21 @@ unsigned long getCurrTimeMs( void )
 	return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000);
 }
 
-void    Polling::startMonitoringFd( int fd, short events, APollEventHandler *handler, bool trackTimeout )
+void	Polling::setTimeout(APollEventHandler *handler, size_t timeoutMs)
+{
+	if (handler) {
+		_pollTimeouts[handler->index] = getCurrTimeMs() + timeoutMs;
+	}
+}
+
+void    Polling::startMonitoringFd( int fd, short events, APollEventHandler *handler, size_t timeoutMs )
 {
 	_pollFds[handler->index].fd = fd;
 	_pollFds[handler->index].events = events;
 	_pollFds[handler->index].revents = 0;
 	_pollEventHandlers[handler->index] = handler;
-	if (trackTimeout)
-		_pollTimeouts[handler->index] = getCurrTimeMs() + timeout_ms;
+	if (timeoutMs > 0)
+		_pollTimeouts[handler->index] = getCurrTimeMs() + timeoutMs;
 }
 
 void    Polling::stopMonitoringFd( APollEventHandler *handler )
@@ -119,9 +126,7 @@ void    Polling::stopMonitoringFd( APollEventHandler *handler )
 
 void    Polling::startPolling( void )
 {
-	int poll_timeout = -1;
-	if (timeout_ms > 0)
-		poll_timeout = 200;
+	int poll_timeout = 200;
 	while (Polling::pollterminator == 0) {
 		std::size_t currSize = _pollFds.size();
 		int ret = poll(_pollFds.data(), currSize, poll_timeout);
@@ -137,7 +142,7 @@ void    Polling::startPolling( void )
 			
 			if (poll_timeout == 200 && _pollTimeouts[i] > 0 && _pollTimeouts[i] < curr_time) {
 				_pollEventHandlers[i]->handleTimeout();
-				_pollTimeouts[i] = getCurrTimeMs() + timeout_ms;
+				// _pollTimeouts[i] = getCurrTimeMs() + timeout_ms;
 			}
 			else if (_pollFds[i].revents != 0)
 				_pollEventHandlers[i]->handleEvent(_pollFds[i]);

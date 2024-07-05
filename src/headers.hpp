@@ -23,6 +23,7 @@
 
 #define EMPTY_STRING ""
 #define DEFAULT_ROOT_PATH "/home/juzoanya/webserv_new/www"
+#define DEFAULT_TIMEOUT_MS 10000
 typedef std::string   buff_t;
 typedef std::map<std::string, std::vector<std::string> > ws_config_t;
 

@@ -34,8 +34,8 @@ std::string getStateStr(short state)
 	return (str);
 }
 
-std::size_t  HttpMessage::readBufferSize = 4096;
-char         HttpMessage::readBuffer[4096];
+std::size_t  HttpMessage::readBufferSize = 8192;
+char         HttpMessage::readBuffer[8192];
 
 HttpMessage::HttpMessage( void ) 
  :  _buffer(), _dataPtr(NULL), _maxBodySizeGetter(NULL), _contentLength(0), _maxBodySize(readBufferSize), _status(ws_http::STATUS_UNDEFINED), _state(PARSE_SIZE)

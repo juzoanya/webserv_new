@@ -39,7 +39,7 @@ HttpServer::HttpServer( WsIpPort const & ipPort, Polling & polling )
 		close(serversocket);
 		throw std::runtime_error(std::string("server socket: listen: ")  + strerror(errno));
 	}
-	_polling.startMonitoringFd(serversocket, POLLIN, this, false);
+	_polling.startMonitoringFd(serversocket, POLLIN, this, 0);
 }
 
 
@@ -111,7 +111,7 @@ void HttpServer::handleEvent( struct pollfd pollfd )
 			}
 			WsIpPort ipPortData(*reinterpret_cast<struct sockaddr_in*>(&addr));
 			HttpHandler *newHandler = new HttpHandler(ipPortData, _polling, *this);
-			_polling.startMonitoringFd(clientSocket, POLLIN | POLLOUT, newHandler, true);
+			_polling.startMonitoringFd(clientSocket, POLLIN | POLLOUT, newHandler, DEFAULT_TIMEOUT_MS);
 			Polling::logFile << "new connection: " << ipPortData << " socket: " << clientSocket << std::endl;
 		}
 	} catch(const std::exception& e) {

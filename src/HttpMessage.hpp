@@ -43,7 +43,7 @@ class HttpMessage {
 		HttpHeader  header;
 
 		static std::size_t      readBufferSize;
-		static char             readBuffer[4096];
+		static char             readBuffer[8192];
 
 		bool                    isCgi( void ) const;
 		bool                    responseSet( void ) const;

@@ -13,7 +13,7 @@
 #include "headers.hpp"
 
 HttpHandler::HttpHandler( WsIpPort const & ipPort, Polling & polling, HttpServer & server )
- : APollEventHandler(polling, true), ipPortData(ipPort), _childProcessHandler(NULL), _server(server), _httpMessage(&server)
+ : APollEventHandler(polling, true), ipPortData(ipPort), _childProcessHandler(NULL), _server(server), _httpMessage(&server), _closeConnect(false)
 { }
 
 HttpHandler::~HttpHandler( void )
@@ -42,10 +42,13 @@ void    HttpHandler::handleTimeout( void )
     if(_httpMessage.isCgi()){
 		quitCgiProcess();
         _httpMessage = HttpMessage(NULL);
+		_closeConnect = true;
+		_polling.setTimeout(this, DEFAULT_TIMEOUT_MS);
         _httpMessage.setResponse(ws_http::STATUS_504_GATEWAY_TIMEOUT, NULL, "", "");
-    } else {
-        quit();
     }
+	else {
+		quit();
+	}
 }
 
 void    HttpHandler::handleEvent( struct pollfd pollfd )
@@ -70,8 +73,13 @@ void    HttpHandler::handleEvent( struct pollfd pollfd )
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
 		if (sendBytes == -1 || sendBytes == 0)
 			return (quit());
-		if (!_httpMessage.responseSet() && _closeConnect)
-			return (quit());
+		if (!_httpMessage.responseSet()) {
+			if(_closeConnect) {
+				return (quit());
+			}
+			_polling.setTimeout(this, DEFAULT_TIMEOUT_MS);
+		}
+			
 	}
 }
 
@@ -89,23 +97,13 @@ void    HttpHandler::handleChildEvent( struct pollfd & pollfd )
 			_httpMessage =HttpMessage(&_server);
 			return (_httpMessage.setResponse(ws_http::STATUS_502_BAD_GATEWAY, NULL, "", ""));
 		}
-		if (readBytes == -1) {
+		if (readBytes == -1 || readBytes == 0)
 			return (quit());
-		} else if (readBytes == 0) {
-
-		} else {
-
-		}
 	}
 	if (pollfd.revents & POLLOUT && _httpMessage.responseSet() && _httpMessage.isCgi()) {
 		int sendBytes = _httpMessage.sendDataToSocket(pollfd.fd, 0);
-		if (sendBytes == -1) {
+		if (sendBytes == -1 || sendBytes == 0)
 			return (quit());
-		} else if (sendBytes == 0) {
-
-		} else {
-
-		}
 	}
 }
 
@@ -315,7 +313,6 @@ void  HttpHandler::processPost( HttpConfig const & config, FileInfo const & file
 	FileInfo uploadedDir(config.getFilePath(), true);
 	std::stringstream ss;
 	uploadedDir.setDirListing(ss, _httpMessage.header.getHeader("@pathdecoded"));
-	//_httpMessage.printMessage(0);
 	return (_httpMessage.setResponse(ws_http::STATUS_201_CREATED, &ss, "text/html", _httpMessage.header.getHeader("@path")));
 }
 
